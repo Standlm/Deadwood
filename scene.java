@@ -1,8 +1,17 @@
 import java.util.Random;
 public class scene {
 
-    public static void main(String[] args) {
-        // something
+    // Scene Constructor just to heintlp understand Role more
+    public scene(String locationID,  sceneNum, String Description, int budget, String[] roles,) {
+
     }
+
+    // act
+    
+
+    
+    // act
+    
+    //rehearse
 
 }
