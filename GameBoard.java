@@ -4,7 +4,7 @@ public class GameBoard {
 
     public static void main(String[] args) {
         int day = 1;
-        public ArrayList<Scene> scenes = new ArrayList<>();
+        ArrayList<Scene> scenes = new ArrayList<>();
         // something
 
 

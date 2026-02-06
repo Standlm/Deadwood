@@ -15,6 +15,9 @@ public class Dice {
         }
         return rolledDice;
     }
+      public static void main(String[] args) {
+        
+    }
 
     
 }

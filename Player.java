@@ -1,4 +1,3 @@
-import java.util.Random;
 public class Player {
     private String name;
     private int rank;
@@ -13,20 +12,24 @@ public class Player {
         this.credits = credits;
         this.rehearsalChips = rehearsalChips;
     }
-    move(boardSpace space){
+      public static void main(String[] args) {
+        
+    }
+    void move(BoardSpace space){
         // move to a new space
     }
 
-    takeRole(Scene scene,  Role r){
+    void takeRole(Scene scene,  Role r){
         // take a role
     }
-    act(Scene scene, Role r){
+    void act(Scene scene, Role r){
         // act on a scene
     }
-    rehearse(Scene scene, Role r){
+     void rehearse(Scene scene, Role r){
         // rehearse a scene
     }   
-    upgradeRank(Boolean useDollars, Boolean useCredits, int rank){
+    public Boolean upgradeRank(Boolean useDollars, Boolean useCredits, int rank){
+        return true;
         
         // upgrade rank
     }

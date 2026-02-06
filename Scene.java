@@ -1,4 +1,3 @@
-import java.util.Random;
 public class Scene {
     private String locationID;
     private String sceneName;
@@ -12,7 +11,9 @@ public class Scene {
         this.budget = budget;
         this.roles = roles;
     }
-
+      public static void main(String[] args) {
+        
+    }
     // act
     
 

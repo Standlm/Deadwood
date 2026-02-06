@@ -1,3 +1,4 @@
+
 public class Role {
     private String type;
     private int rank;
@@ -8,6 +9,9 @@ public class Role {
         this.rank = rank;
         this.type = type;
 
+    }
+       public static void main(String[] args) {
+        
     }
 
     public boolean isOnCard(){
