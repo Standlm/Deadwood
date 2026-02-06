@@ -8,6 +8,7 @@ public class BoardSpace {
     // Turn into list or something of neighbors
     private String neighbors;
     
+
     public static void main(String[] args) {
         BoardSpace bSpace = new BoardSpace(args[0], args[1]);
         System.out.println("The id of this role is: " + bSpace.id + ".\n" + "The type of role: " + bSpace.type);
