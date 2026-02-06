@@ -2,8 +2,8 @@
 
 public class BoardSpace {
 
-    private String id;
-    private String type;
+    private final String id;
+    private final String type;
 
     // Turn into list or something of neighbors
     private String neighbors;

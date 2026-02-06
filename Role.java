@@ -1,4 +1,4 @@
-
+ 
 public class Role {
     private String type;
     private int rank;
