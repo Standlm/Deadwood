@@ -1,5 +1,5 @@
 import java.util.Random;
-public class dice {
+public class Dice {
 
     int diceNum;
     Random r = new Random();

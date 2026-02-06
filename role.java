@@ -1,18 +1,14 @@
-public class role {
+public class Role {
     private String type;
     private int rank;
     private String name;
     // roles get sent in Name, rank, type
-    public role( String name, int rank, String type){
+    public Role( String name, int rank, String type){
         this.name = name;
         this.rank = rank;
         this.type = type;
 
     }
-
-
-
-
 
     public boolean isOnCard(){
     if ( this.type.equals("Featured") == true ){
