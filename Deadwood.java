@@ -23,14 +23,6 @@ public class Deadwood {
         //Role example for test cases
         Role roleExample = new Role(rolename, rolerank, roletype);
         Role.printRole(roleExample);
-     
-    
-     
-
-
- 
-
-        // Run Roll Example
 
         // Eventually, run GameBoard
     }
