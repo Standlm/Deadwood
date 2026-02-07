@@ -15,7 +15,7 @@ public class BoardSpace {
         String[] neighbors = {"General Store", "Train Station", "Main Street"};
         // board space concept
         BoardSpace bSpace = new BoardSpace(id, type, neighbors);
-        System.out.println("The id of this role is: " + bSpace.id + ".\n" + "The type of role: " + bSpace.type);
+        System.out.println("The id of this space is: " + bSpace.id + ".\n" + "The type of space: " + bSpace.type);
 
         System.out.println("Here are the neighbors of this space:");
         for (int i = 0; i < bSpace.neighbors.length; i++){
