@@ -16,6 +16,11 @@ public class BoardSpace {
         // board space concept
         BoardSpace bSpace = new BoardSpace(id, type, neighbors);
         System.out.println("The id of this role is: " + bSpace.id + ".\n" + "The type of role: " + bSpace.type);
+
+        System.out.println("Here are the neighbors of this space:");
+        for (int i = 0; i < bSpace.neighbors.length; i++){
+            System.out.println((i + 1)  + ". " + bSpace.neighbors[i]);
+        }
     }
 
     public BoardSpace(String spaceId, String spaceType, String[] spaceNeighbors) {
