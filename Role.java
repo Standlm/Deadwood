@@ -11,9 +11,24 @@ public class Role {
 
     }
        public static void main(String[] args) {
+        String type = "On-Card";
+        String name = "Marshal Canfield";
+        int rank = 3;
+        //Role example for test cases
+        Role roleExample = new Role(name, rank, type);
+        printRole(roleExample);
         
     }
 
+
+
+
+    public static void printRole(Role role ) {
+        System.out.println("This is a " + role.type + " role \n");
+        System.out.println("This role is playing as " + role.name + "\n");
+        System.out.println("This role is level " +role.rank + "\n");
+
+    }
     public boolean isOnCard(){
     if ( this.type.equals("Featured") == true ){
             return true;
