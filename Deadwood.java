@@ -16,7 +16,13 @@ public class Deadwood {
         BoardSpace.printBoardSpace(jail);
 
         // we want main to set up the GameBoard
-
+        // testing a role
+        String roletype = "On-Card";
+        String rolename = "Marshal Canfield";
+        int rolerank = 3;
+        //Role example for test cases
+        Role roleExample = new Role(rolename, rolerank, roletype);
+        Role.printRole(roleExample);
      
     
      
