@@ -6,16 +6,21 @@ public class BoardSpace {
     private final String type;
 
     // Turn into list or something of neighbors
-    private String neighbors;
+    private String[] neighbors;
     
 
     public static void main(String[] args) {
-        BoardSpace bSpace = new BoardSpace(args[0], args[1]);
+        String id = "Jail";
+        String type = "sceneHolder";
+        String[] neighbors = {"General Store", "Train Station", "Main Street"};
+        // board space concept
+        BoardSpace bSpace = new BoardSpace(id, type, neighbors);
         System.out.println("The id of this role is: " + bSpace.id + ".\n" + "The type of role: " + bSpace.type);
     }
 
-    public BoardSpace(String spaceId, String spaceType) {
+    public BoardSpace(String spaceId, String spaceType, String[] spaceNeighbors) {
         this.id = spaceId; // use 'this' to refer to the class variable
         this.type = spaceType;
+        this.neighbors = spaceNeighbors;
     }
 }
