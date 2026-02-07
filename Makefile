@@ -1,3 +1,6 @@
 all: makeGame
-makeGame: Deadwood.java GameBoard.java  Player.java Player.java Role.java Scene.java
-	java Deadwood.java GameBoard.java  Player.java Player.java Role.java Scene.java
+makeGame: Deadwood.java
+	javac Deadwood.java
+clean: Deadwood.class
+	rm BoardSpace.class Deadwood.class Role.class
+
