@@ -8,7 +8,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 //board.xml
 //cards.xml
-public class LoadXml extends Deadwood {
+public class LoadXml   {
     public static void main(String argv[]) {
     
     

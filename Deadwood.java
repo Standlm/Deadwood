@@ -7,6 +7,9 @@ public class Deadwood {
         // only instantiate once
         Scanner myObj = new Scanner(System.in);
 
+
+        // we want main to set up the GameBoard
+
      
     
      
@@ -18,33 +21,6 @@ public class Deadwood {
 
         // Eventually, run GameBoard
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     private static void print(String toPrint) {
