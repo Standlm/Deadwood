@@ -8,6 +8,13 @@ public class Deadwood {
         Scanner myObj = new Scanner(System.in);
 
 
+        // Testing BoardSpace
+        String id = "Jail";
+        String type = "sceneHolder";
+        String[] neighbors = {"General Store", "Train Station", "Main Street"};
+        BoardSpace jail = new BoardSpace(id, type, neighbors);
+        BoardSpace.printBoardSpace(jail);
+
         // we want main to set up the GameBoard
 
      
@@ -15,7 +22,7 @@ public class Deadwood {
      
 
 
-        // Run Board Space Example
+ 
 
         // Run Roll Example
 
