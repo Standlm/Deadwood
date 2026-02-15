@@ -49,5 +49,9 @@ public class Scene {
     public boolean isWrapped() {
         return shotsLeft >= 0;
     }
+    public int getNumShots() {
+        return shotsLeft;
+    }
+     
 
 }

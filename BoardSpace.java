@@ -50,4 +50,35 @@ public class BoardSpace {
             System.out.println((i + 1)  + ". " + boardSpace.neighbors[i]);
         }
     }
+    // Assign a scene to this BoardSpace and set shots
+    private Scene scene;
+    private int shots;
+    private int maxShots;
+
+    public void setScene(Scene s) {
+        this.scene = s;
+        if (s != null) {
+            this.maxShots = s.getNumShots();
+            this.shots = this.maxShots;
+        } else {
+            this.maxShots = 0;
+            this.shots = 0;
+        }
+    }
+
+    // Remove the scene from this BoardSpace and reset shots
+    public void removeScene() {
+        this.scene = null;
+        this.shots = 0;
+        this.maxShots = 0;
+    }
+
+    // Reset shots to maxShots (if a scene is present)
+    public void resetShots() {
+        if (this.scene != null) {
+            this.shots = this.maxShots;
+        } else {
+            this.shots = 0;
+        }
+    }
 }

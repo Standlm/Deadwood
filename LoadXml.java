@@ -7,6 +7,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+import java.util.Collections;
 
 public class LoadXml {
    public List<BoardSpace> loadBoardSpaces() {
@@ -63,6 +64,7 @@ public class LoadXml {
          DocumentBuilder var4 = var3.newDocumentBuilder();
          Document var5 = var4.parse(var2);
          var5.getDocumentElement().normalize();
+         //everything is sorted by card, so we get all the cards and then sort through the parts and scenes to make the Scene objects
          NodeList var6 = var5.getElementsByTagName("card");
 
          for(int var7 = 0; var7 < var6.getLength(); ++var7) {
@@ -70,6 +72,7 @@ public class LoadXml {
             String var9 = var8.getAttribute("name");
             int var10 = Integer.parseInt(var8.getAttribute("budget"));
             NodeList var11 = var8.getElementsByTagName("scene");
+            //location Id
             String var12 = "";
             if (var11.getLength() > 0) {
                Element var13 = (Element)var11.item(0);
@@ -77,16 +80,16 @@ public class LoadXml {
             }
 
             NodeList var20 = var8.getElementsByTagName("part");
-            Role[] var14 = new Role[var20.getLength()];
+            Role[] role = new Role[var20.getLength()];
 
             for(int var15 = 0; var15 < var20.getLength(); ++var15) {
                Element var16 = (Element)var20.item(var15);
-               String var17 = var16.getAttribute("name");
-               int var18 = Integer.parseInt(var16.getAttribute("level"));
-               var14[var15] = new Role(var17, var18, "Featured");
+               String sceneN = var16.getAttribute("name");
+               int level = Integer.parseInt(var16.getAttribute("level"));
+               role[var15] = new Role(sceneN, level, "Featured");
             }
 
-            Scene var21 = new Scene(var12, var9, var10, var14);
+            Scene var21 = new Scene(var12, var9, var10, role, var10);
             var1.add(var21);
          }
       } catch (Exception var19) {
