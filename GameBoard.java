@@ -70,6 +70,7 @@ import java.util.Random;
         public void endDay() {
             for (Player p : players) {
                 p.move(trailerSpace);
+                // Define Reset role in Player
                 p.resetRole();
             }
             for (BoardSpace space : boardSpaces) {

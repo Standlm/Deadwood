@@ -32,6 +32,11 @@ public class Player {
     }
 
 
+    // Temp Methods
+    public void resetRole(){
+        
+    }
+
     void move(BoardSpace space){
         // move to a new space
     }
