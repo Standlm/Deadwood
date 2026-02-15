@@ -1,8 +1,8 @@
 
 import java.util.ArrayList;
     // code for starting the day
-    import java.util.Collections;
-    import java.util.Random;
+import java.util.Collections;
+import java.util.Random;
 
     public class GameBoard {
         public int day = 1;

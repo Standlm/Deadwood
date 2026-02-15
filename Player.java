@@ -16,6 +16,22 @@ public class Player {
       public static void main(String[] args) {
         
     }
+
+    // Player Getters
+    public int getDollars(){
+        return dollars;
+    }
+    public int getCredits(){
+        return credits;
+    }
+    public String getName(){
+        return name;
+    }
+    public int getRank(){
+        return rank;
+    }
+
+
     void move(BoardSpace space){
         // move to a new space
     }
@@ -23,12 +39,15 @@ public class Player {
     void takeRole(Scene scene,  Role r){
         // take a role
     }
-    void act(Scene scene, Role r){
-        // act on a scene
-    }
-     void rehearse(Scene scene, Role r){
-        // rehearse a scene
-    }   
+
+    // [Act and Rehearse stored in Scene. LMK if you want me to move them]
+    // void act(Scene scene, Role r){
+        
+    // }
+    //  void rehearse(Scene scene, Role r){
+    //     // rehearse a scene
+    // }
+       
     public Boolean upgradeRank(Boolean useDollars, Boolean useCredits, int rank){
         return true;
         

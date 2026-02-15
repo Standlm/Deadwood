@@ -28,6 +28,11 @@ public class BoardSpace {
         return type;
     }
 
+    // Checker
+    public boolean isSet(){
+        return type.equals("set");
+    }
+
     public BoardSpace(String spaceId, String spaceType, String[] spaceNeighbors) {
         this.id = spaceId; // use 'this' to refer to the class variable
         this.type = spaceType;
