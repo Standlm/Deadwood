@@ -23,6 +23,17 @@ public class Deadwood {
         //Role example for test cases
         Role roleExample = new Role(rolename, rolerank, roletype);
         Role.printRole(roleExample);
+        
+        // Test: LoadXml with GameBoard
+        System.out.println("--- GameBoard & LoadXml Test ---");
+        GameBoard gameBoard = new GameBoard();
+        LoadXml loader = new LoadXml();
+        loader.loadGameData(gameBoard);
+        System.out.println("Loaded " + gameBoard.boardSpaces.size() + " board spaces and " + gameBoard.sceneDeck.size() + " scenes into GameBoard.");
+        if (!gameBoard.boardSpaces.isEmpty()) {
+            BoardSpace first = gameBoard.boardSpaces.get(0);
+            System.out.println("First BoardSpace: " + first.getId() + ", type: " + first.getType());
+        }
 
         // Eventually, run GameBoard
     }
