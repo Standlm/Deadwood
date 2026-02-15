@@ -20,6 +20,14 @@ public class BoardSpace {
         printBoardSpace(bSpace);
     }
 
+    // getters
+    public String getId(){
+        return id;
+    }
+    public String getType(){
+        return type;
+    }
+
     public BoardSpace(String spaceId, String spaceType, String[] spaceNeighbors) {
         this.id = spaceId; // use 'this' to refer to the class variable
         this.type = spaceType;
