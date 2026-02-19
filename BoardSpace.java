@@ -1,54 +1,56 @@
 
 
-public class BoardSpace {
 
+public class BoardSpace {
     private final String id;
     private final String type;
-
-    // May need value for scene later, once scene type is decided on
-
-    // May need to change element type for XML parsing cohesion
     private String[] neighbors;
-    
+    private Role[] roles; // extras for this set (or empty for trailer/office)
 
-    public static void main(String[] args) {
-        String id = "Jail";
-        String type = "sceneHolder";
-        String[] neighbors = {"General Store", "Train Station", "Main Street"};
-        // board space concept
-        BoardSpace bSpace = new BoardSpace(id, type, neighbors);
-        printBoardSpace(bSpace);
-    }
+    public static void main(String[] args) {}
 
     // getters
-    public String getId(){
-        return id;
-    }
-    public String getType(){
-        return type;
-    }
+    public String getId(){ return id; }
+    public String getType(){ return type; }
+    public boolean isSet(){ return type.equals("set"); }
 
-    // Checker
-    public boolean isSet(){
-        return type.equals("set");
-    }
-
+    // Old constructor for compatibility
     public BoardSpace(String spaceId, String spaceType, String[] spaceNeighbors) {
-        this.id = spaceId; // use 'this' to refer to the class variable
+        this(spaceId, spaceType, spaceNeighbors, new Role[0]);
+    }
+
+    // New constructor for sets with roles/extras
+    public BoardSpace(String spaceId, String spaceType, String[] spaceNeighbors, Role[] roles) {
+        this.id = spaceId;
         this.type = spaceType;
         this.neighbors = spaceNeighbors;
+        this.roles = roles;
     }
 
     public static void printBoardSpace(BoardSpace boardSpace){
         System.out.println("The id of this space is: " + boardSpace.id 
             + ".\n" + "The type of space: " + boardSpace.type);
-        
         System.out.println("Here are the neighbors of this space:");
-
-        // Loop for all spaces to go next
         for (int i = 0; i < boardSpace.neighbors.length; i++){
             System.out.println((i + 1)  + ". " + boardSpace.neighbors[i]);
         }
+        if (boardSpace.roles != null && boardSpace.roles.length > 0) {
+            System.out.println("Extras/roles on this set:");
+            for (int i = 0; i < boardSpace.roles.length; i++) {
+                System.out.println((i+1) + ". " + boardSpace.roles[i].getName() + " (Rank: " + boardSpace.roles[i].getRank() + ")");
+            }
+        }
+    }
+        // Return extras/roles for this set (or empty array)
+        public Role[] getRoles() {
+            return roles != null ? roles : new Role[0];
+        }
+    //make a trailer space for reset purposes
+    public static BoardSpace createTrailerSpace() {
+        String id = "Trailer";
+        String type = "trailer";
+        String[] neighbors = {}; // Trailer has no neighbors
+        return new BoardSpace(id, type, neighbors);
     }
     // Assign a scene to this BoardSpace and set shots
     private Scene scene;
@@ -80,5 +82,15 @@ public class BoardSpace {
         } else {
             this.shots = 0;
         }
+    }
+
+    // we need to return neighbors for player movement
+    public String[] getNeighbors() {
+        return neighbors;
+    }
+
+    // we need to return the scene for acting
+    public Scene getScene() {
+        return scene;
     }
 }

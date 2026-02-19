@@ -1,58 +1,185 @@
 import java.util.Scanner;
 
 public class Deadwood {
-
     public static void main(String[] args) {
-
-        // only instantiate once
-        Scanner myObj = new Scanner(System.in);
-
-
-        // Testing BoardSpace
-        String id = "Jail";
-        String type = "sceneHolder";
-        String[] neighbors = {"General Store", "Train Station", "Main Street"};
-        BoardSpace jail = new BoardSpace(id, type, neighbors);
-        BoardSpace.printBoardSpace(jail);
-
-        // we want main to set up the GameBoard
-        // testing a role
-        String roletype = "On-Card";
-        String rolename = "Marshal Canfield";
-        int rolerank = 3;
-        //Role example for test cases
-        Role roleExample = new Role(rolename, rolerank, roletype);
-        Role.printRole(roleExample);
-        
-        // Test: LoadXml with GameBoard
-        System.out.println("--- GameBoard & LoadXml Test ---");
-        GameBoard gameBoard = new GameBoard();
+        GameBoard game = new GameBoard();
         LoadXml loader = new LoadXml();
-        loader.loadGameData(gameBoard);
-        System.out.println("Loaded " + gameBoard.boardSpaces.size() + " board spaces and " + gameBoard.sceneDeck.size() + " scenes into GameBoard.");
-        if (!gameBoard.boardSpaces.isEmpty()) {
-            BoardSpace first = gameBoard.boardSpaces.get(0);
-            System.out.println("First BoardSpace: " + first.getId() + ", type: " + first.getType());
+        GameView view = new ConsoleView();
+
+        // Load XML data into GameBoard
+        loader.loadGameData(game);
+
+        view.printMessage("Enter number of players (2–8): ");
+        int numPlayers = -1;
+        while (numPlayers < 2 || numPlayers > 8) {
+            try {
+                numPlayers = Integer.parseInt(view.getActionChoice());
+                if (numPlayers < 2 || numPlayers > 8) {
+                    view.printMessage("Please enter a number between 2 and 8.");
+                }
+            } catch (Exception e) {
+                view.printMessage("Invalid input. Please enter a number between 2 and 8.");
+            }
         }
 
-        // Eventually, run GameBoard
+        game.setupGame(numPlayers);
+
+        runGame(game, view);
+
+        view.printMessage("\nGame Over!");
+        game.calculateScores();
+        view.printWinner(game.players);
     }
 
+    private static void runGame(GameBoard game, GameView view) {
+        while (!game.isGameOver()) {
+            Player current = game.getCurrentPlayer();
+            view.printCurrentDayAndTurn(game.getCurrentDay(), current);
+            view.printPlayerTurnStart(current);
+            view.printPlayerStats(current);
 
-    private static void print(String toPrint) {
-        char[] chars = toPrint.toCharArray();
-        for (int i=0; i < chars.length; i++) {
-            System.out.print(chars[i]);
-            try { Thread.sleep(25);} 
-            catch (InterruptedException e) {Thread.currentThread().interrupt();}
+            boolean turnOver = false;
+            while (!turnOver) {
+                view.printMessage("\nChoose action:");
+                view.printMessage("1. Move");
+                view.printMessage("2. Take Role");
+                view.printMessage("3. Act");
+                view.printMessage("4. Rehearse");
+                view.printMessage("5. End Turn");
+
+                int choice = -1;
+                try {
+                    choice = Integer.parseInt(view.getActionChoice());
+                } catch (Exception e) {
+                    view.printMessage("Invalid input. Please enter a number.");
+                    continue;
+                }
+
+                switch (choice) {
+                    case 1:
+                        handleMove(game, current, view);
+                        break;
+                    case 2:
+                        handleTakeRole(current, view);
+                        view.printCurrentDayAndTurn(game.getCurrentDay(), current);
+                        view.printPlayerTurnStart(current);
+                        view.printPlayerStats(current);
+                        break;
+                    case 3:
+                        if (current.getRole() == null) {
+                            view.printMessage("You must take a role before acting.");
+                        } else {
+                            handleAct(current, view);
+                        }
+                        break;
+                    case 4:
+                        if (current.getRole() == null) {
+                            view.printMessage("You must take a role before rehearsing.");
+                        } else {
+                            handleRehearse(current, view);
+                        }
+                        break;
+                    case 5:
+                        turnOver = true;
+                        break;
+                    default:
+                        view.printMessage("Invalid choice.");
+                }
+            }
+            game.nextTurn();
         }
-        System.out.println("");
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
+    
+    }
+
+    private static void handleMove(GameBoard game, Player player, GameView view) {
+        BoardSpace current = player.getCurrentSpace();
+        String[] neighbors = current.getNeighbors();
+        view.printMoveOptions(neighbors);
+        int choice = view.getMoveChoice();
+        if (choice >= 0 && choice < neighbors.length) {
+            BoardSpace destination = game.getBoardSpaceByName(neighbors[choice]);
+            game.movePlayer(player, destination);
+            view.printMessage("Moved to " + neighbors[choice]);
+            // Print scene and roles if on a set
+            if (destination.isSet()) {
+                Scene scene = destination.getScene();
+                if (scene != null) {
+                    view.printMessage("Scene: " + scene.getSceneName() + " (Budget: " + scene.getBudget() + ")");
+                    Role[] roles = scene.roles;
+                    view.printMessage("Available roles on this scene:");
+                    for (int i = 0; i < roles.length; i++) {
+                        view.printMessage((i+1) + ". " + roles[i].getName() + " (Rank: " + roles[i].getRank() + ")");
+                    }
+                }
+            }
+        } else {
+            view.printMessage("Invalid move.");
+        }
+    }
+        // Handle taking a role
+        private static void handleTakeRole(Player player, GameView view) {
+            BoardSpace current = player.getCurrentSpace();
+            if (!current.isSet()) {
+                view.printMessage("You must be on a set to take a role.");
+                return;
+            }
+            Scene scene = current.getScene();
+            if (scene == null) {
+                view.printMessage("No scene available on this set.");
+                return;
+            }
+            Role[] roles = scene.roles;
+            view.printMessage("Available roles:");
+            for (int i = 0; i < roles.length; i++) {
+                view.printMessage((i+1) + ". " + roles[i].getName() + " (Rank: " + roles[i].getRank() + ")");
+            }
+            view.printMessage("Enter the number of the role you want to take:");
+            int choice = -1;
+            try {
+                choice = Integer.parseInt(view.getActionChoice()) - 1;
+            } catch (Exception e) {
+                view.printMessage("Invalid input. Please enter a number.");
+                return;
+            }
+            if (choice >= 0 && choice < roles.length) {
+                boolean taken = player.takeRole(scene, roles[choice]);
+                if (taken) {
+                    view.printMessage("You took the role: " + roles[choice].getName());
+                } else {
+                    view.printMessage("Could not take the role. Check your rank or if you already have a role.");
+                }
+            } else {
+                view.printMessage("Invalid role choice.");
+            }
+
+    }
+
+    private static void handleAct(Player player, GameView view) {
+        if (player.getRole() == null) {
+            view.printMessage("You do not have a role.");
+            return;
+        }
+        Scene scene = player.getCurrentSpace().getScene();
+        int dice = (int)(Math.random() * 6) + 1;
+        boolean success = scene.act(player.getRole(), dice);
+        view.printMessage("Rolled: " + dice);
+        if (success) {
+            view.printMessage("Acting successful!");
+        } else {
+            view.printMessage("Acting failed.");
+        }
+        if (scene.isWrapped()) {
+            view.printMessage("Scene wrapped!");
+            player.getCurrentSpace().removeScene();
         }
     }
 
-
+    private static void handleRehearse(Player player, GameView view) {
+        if (player.getRole() == null) {
+            view.printMessage("You do not have a role.");
+            return;
+        }
+        player.getRole().rehearse();
+        view.printMessage("Rehearsed. Practice shots: " + player.getRole().getPracticeShots());
+    }
 }

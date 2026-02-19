@@ -11,48 +11,65 @@ import java.util.Collections;
 
 public class LoadXml {
    public List<BoardSpace> loadBoardSpaces() {
-      ArrayList var1 = new ArrayList();
-
+      ArrayList<BoardSpace> spaces = new ArrayList<>();
       try {
-         File var2 = new File("xml/board.xml");
-         DocumentBuilderFactory var3 = DocumentBuilderFactory.newInstance();
-         DocumentBuilder var4 = var3.newDocumentBuilder();
-         Document var5 = var4.parse(var2);
-         var5.getDocumentElement().normalize();
-         NodeList var6 = var5.getElementsByTagName("set");
+         File file = new File("xml/board.xml");
+         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+         DocumentBuilder builder = factory.newDocumentBuilder();
+         Document doc = builder.parse(file);
+         doc.getDocumentElement().normalize();
 
-         for(int var7 = 0; var7 < var6.getLength(); ++var7) {
-            Element var8 = (Element)var6.item(var7);
-            String var9 = var8.getAttribute("name");
-            NodeList var10 = var8.getElementsByTagName("neighbor");
-            String[] var11 = new String[var10.getLength()];
-
-            int var12;
-            for(var12 = 0; var12 < var10.getLength(); ++var12) {
-               var11[var12] = ((Element)var10.item(var12)).getAttribute("name");
+         // Load all <set> nodes
+         NodeList setNodes = doc.getElementsByTagName("set");
+         for (int i = 0; i < setNodes.getLength(); ++i) {
+            Element setElem = (Element) setNodes.item(i);
+            String name = setElem.getAttribute("name");
+            NodeList neighborNodes = setElem.getElementsByTagName("neighbor");
+            String[] neighbors = new String[neighborNodes.getLength()];
+            for (int j = 0; j < neighborNodes.getLength(); ++j) {
+               neighbors[j] = ((Element) neighborNodes.item(j)).getAttribute("name");
             }
-
-            boolean var21 = false;
-            NodeList var13 = var8.getElementsByTagName("take");
-            var12 = var13.getLength();
-            NodeList var14 = var8.getElementsByTagName("part");
-            Role[] var15 = new Role[var14.getLength()];
-
-            for(int var16 = 0; var16 < var14.getLength(); ++var16) {
-               Element var17 = (Element)var14.item(var16);
-               String var18 = var17.getAttribute("name");
-               int var19 = Integer.parseInt(var17.getAttribute("level"));
-               var15[var16] = new Role(var18, var19, "Extra");
+            NodeList partNodes = setElem.getElementsByTagName("part");
+            Role[] extras = new Role[partNodes.getLength()];
+            for (int k = 0; k < partNodes.getLength(); ++k) {
+               Element partElem = (Element) partNodes.item(k);
+               String roleName = partElem.getAttribute("name");
+               int roleRank = Integer.parseInt(partElem.getAttribute("level"));
+               extras[k] = new Role(roleName, roleRank, "Extra");
             }
-
-            BoardSpace var22 = new BoardSpace(var9, "set", var11);
-            var1.add(var22);
+            BoardSpace space = new BoardSpace(name, "set", neighbors, extras);
+            spaces.add(space);
          }
-      } catch (Exception var20) {
-         var20.printStackTrace();
-      }
 
-      return var1;
+         // Load <trailer>
+         NodeList trailerNodes = doc.getElementsByTagName("trailer");
+         if (trailerNodes.getLength() > 0) {
+            Element trailerElem = (Element) trailerNodes.item(0);
+            NodeList neighborNodes = trailerElem.getElementsByTagName("neighbor");
+            String[] neighbors = new String[neighborNodes.getLength()];
+            for (int j = 0; j < neighborNodes.getLength(); ++j) {
+               neighbors[j] = ((Element) neighborNodes.item(j)).getAttribute("name");
+            }
+            BoardSpace trailer = new BoardSpace("trailer", "trailer", neighbors, new Role[0]);
+            spaces.add(trailer);
+         }
+
+         // Load <office>
+         NodeList officeNodes = doc.getElementsByTagName("office");
+         if (officeNodes.getLength() > 0) {
+            Element officeElem = (Element) officeNodes.item(0);
+            NodeList neighborNodes = officeElem.getElementsByTagName("neighbor");
+            String[] neighbors = new String[neighborNodes.getLength()];
+            for (int j = 0; j < neighborNodes.getLength(); ++j) {
+               neighbors[j] = ((Element) neighborNodes.item(j)).getAttribute("name");
+            }
+            BoardSpace office = new BoardSpace("office", "office", neighbors, new Role[0]);
+            spaces.add(office);
+         }
+      } catch (Exception e) {
+         e.printStackTrace();
+      }
+      return spaces;
    }
 
    public List<Scene> loadScenes() {

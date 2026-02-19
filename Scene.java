@@ -3,7 +3,7 @@ public class Scene {
     private String locationID;
     private String sceneName;
     private int budget;
-    private Role[] roles;
+    public Role[] roles;
     private int shotsLeft;
 
     public static void main(String[] args) {
@@ -47,8 +47,8 @@ public class Scene {
     
     // wrap
     public boolean isWrapped() {
-        return shotsLeft >= 0;
-    }
+    return shotsLeft == 0;
+}
     public int getNumShots() {
         return shotsLeft;
     }

@@ -16,13 +16,21 @@ import java.util.Random;
         // Setup the game board, players, and scenes
         void setupGame(int numPlayers) {
             // Setup board spaces (including trailer)
-            // ...existing code...
-            // Find and set trailerSpace
+            // If boardSpaces is empty, load from XML
+            if (boardSpaces.isEmpty()) {
+                LoadXml loader = new LoadXml();
+                boardSpaces.addAll(loader.loadBoardSpaces());
+            }
+            // Find and set trailerSpace (assume trailer is named "trailer" or is the first space)
+            trailerSpace = null;
             for (BoardSpace space : boardSpaces) {
                 if (space.getId().equalsIgnoreCase("trailer")) {
                     trailerSpace = space;
                     break;
                 }
+            }
+            if (trailerSpace == null && !boardSpaces.isEmpty()) {
+                trailerSpace = boardSpaces.get(0); // fallback
             }
             // Setup players
             for (int i = 0; i < numPlayers; i++) {
@@ -44,6 +52,10 @@ import java.util.Random;
                 }
             }
             day = 1;
+        }
+        //Game Board handles movement
+        public void movePlayer(Player player, BoardSpace destination) {
+            player.move(destination);
         }
 
         // Start a new day: reset players to trailer, redeal scenes, reset shots
@@ -81,6 +93,7 @@ import java.util.Random;
             }
             day++;
         }
+        
 
         // Advance to next player's turn
         void nextTurn() {
@@ -102,7 +115,28 @@ import java.util.Random;
                 System.out.println(p.getName() + " score: " + score);
             }
         }
+    //missing getters and sett for current day
+        public Player getCurrentPlayer() {
+        return players.get(currentPlayerIndex);
     }
+
+    public int getCurrentDay() {
+        return day;
+    }
+
+    public boolean isGameOver() {
+        return checkGameEnd();
+    }  
+    //convers strings to gameboard spaces for movement
+    public BoardSpace getBoardSpaceByName(String string) {
+        for (BoardSpace space : boardSpaces) {
+            if (space.getId().equalsIgnoreCase(string)) {
+                return space;
+            }
+        }
+        return null; // Not found
+    }
+}
 
 
  

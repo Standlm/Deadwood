@@ -50,16 +50,13 @@ public class Role {
 
     }
 
-    public boolean isOnCard(){
-    if ( this.type.equals("Featured") == true ){
-            return true;
-        } else if (this.type.equals("Extra") == true ){
-            return false;
-        }else{
-            
-        }
-        System.err.println("Role is Neither On Card or Off Card\n");
-         throw new  IllegalArgumentException("card Issue");
-
+    public boolean isOnCard() {
+    if (type.equals("Featured")) {
+        return true;
     }
+    if (type.equals("Extra")) {
+        return false;
+    }
+    throw new IllegalArgumentException("Invalid role type");
+}
 }
