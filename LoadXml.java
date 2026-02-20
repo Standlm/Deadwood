@@ -54,7 +54,7 @@ public class LoadXml {
             spaces.add(trailer);
          }
 
-         // Load <office>
+         // Load <office> (Casting Office)
          NodeList officeNodes = doc.getElementsByTagName("office");
          if (officeNodes.getLength() > 0) {
             Element officeElem = (Element) officeNodes.item(0);
@@ -63,7 +63,7 @@ public class LoadXml {
             for (int j = 0; j < neighborNodes.getLength(); ++j) {
                neighbors[j] = ((Element) neighborNodes.item(j)).getAttribute("name");
             }
-            BoardSpace office = new BoardSpace("office", "office", neighbors, new Role[0]);
+            BoardSpace office = new BoardSpace("Casting Office", "office", neighbors, new Role[0]);
             spaces.add(office);
          }
       } catch (Exception e) {

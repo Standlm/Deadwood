@@ -70,4 +70,23 @@ public class ConsoleView implements GameView {
             System.out.println("\n Winner: " + winner.getName());
         }
     }
+    @Override
+    public void printUpgradeOptions(Player player) {
+        int currentRank = player.getRank();
+        System.out.println("Current rank: " + currentRank);
+        System.out.println("Available upgrades:");
+        // Upgrade costs: [rank] -> {dollars, credits}
+        int[][] costs = {
+            {0, 0}, {0, 0}, {4, 5}, {10, 10}, {18, 15}, {28, 20}, {40, 25}
+        };
+        for (int rank = currentRank + 1; rank <= 6; rank++) {
+            System.out.println("Rank " + rank + ": $" + costs[rank][0] + " or " + costs[rank][1] + " credits");
+        }
+        System.out.print("Enter rank to upgrade to (or 0 to cancel): ");
+    }
+
+    @Override
+    public int getUpgradeChoice() {
+        return scanner.nextInt();
+    }
 } 

@@ -93,4 +93,7 @@ public class BoardSpace {
     public Scene getScene() {
         return scene;
     }
+    public boolean isCastingOffice() {
+        return type.equals("office");
+    }   
 }

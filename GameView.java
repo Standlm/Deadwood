@@ -14,9 +14,15 @@ public interface GameView {
     void printMoveOptions(String[] neighbors);
     int getMoveChoice();
 
+    //upgrades 
+    void printUpgradeOptions(Player player);
+    int getUpgradeChoice();
+
     // Actions
     String getActionChoice();
 
     // End of game
     void printWinner(List<Player> players);
+
+
 }

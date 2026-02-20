@@ -45,7 +45,8 @@ public class Deadwood {
                 view.printMessage("2. Take Role");
                 view.printMessage("3. Act");
                 view.printMessage("4. Rehearse");
-                view.printMessage("5. End Turn");
+                view.printMessage("5. Upgrade Rank");
+                view.printMessage("6. End Turn");
 
                 int choice = -1;
                 try {
@@ -80,6 +81,12 @@ public class Deadwood {
                         }
                         break;
                     case 5:
+                        handleUpgradeRank(current, view);
+                        view.printCurrentDayAndTurn(game.getCurrentDay(), current);
+                        view.printPlayerTurnStart(current);
+                        view.printPlayerStats(current);
+                        break;
+                    case 6:
                         turnOver = true;
                         break;
                     default:
@@ -152,6 +159,53 @@ public class Deadwood {
                 view.printMessage("Invalid role choice.");
             }
 
+    }
+    // Upgrade costs: [rank] -> {dollars, credits}
+    private static final int[][] UPGRADE_COSTS = {
+        {0, 0},   // rank 0 (unused)
+        {0, 0},   // rank 1 (unused)
+        {4, 5},   // rank 2: 4 dollars or 5 credits
+        {10, 10}, // rank 3: 10 dollars or 10 credits
+        {18, 15}, // rank 4: 18 dollars or 15 credits
+        {28, 20}, // rank 5: 28 dollars or 20 credits
+        {40, 25}  // rank 6: 40 dollars or 25 credits
+    };
+
+    private static void handleUpgradeRank(Player player, GameView view) {
+        BoardSpace castingOffice = player.getCurrentSpace();
+        if (!castingOffice.isCastingOffice()) {
+            view.printMessage("You must be in the Casting Office to upgrade your rank.");
+            return;
+        }
+        view.printUpgradeOptions(player);
+        int choice = view.getUpgradeChoice();
+        if (choice > player.getRank() && choice <= 6) {
+            int dollarCost = UPGRADE_COSTS[choice][0];
+            int creditCost = UPGRADE_COSTS[choice][1];
+            
+            // Ask if they want to pay with dollars or credits
+            view.printMessage("Pay with: 1. Dollars ($" + dollarCost + ")\n or 2. Credits (" + creditCost + ")");
+            int payChoice = -1;
+            try {
+                payChoice = Integer.parseInt(view.getActionChoice());
+            } catch (Exception e) {
+                view.printMessage("Invalid input.");
+                return;
+            }
+            
+            boolean useDollars = (payChoice == 1);
+            boolean useCredits = (payChoice == 2);
+            int cost = useDollars ? dollarCost : creditCost;
+            
+            boolean upgraded = player.upgradeRank(useDollars, useCredits, choice, cost);
+            if (upgraded) {
+                view.printMessage("Upgraded to rank " + choice + "!");
+            } else {
+                view.printMessage("Not enough dollars or credits to upgrade.");
+            }
+        } else {
+            view.printMessage("Invalid rank choice.");
+        }
     }
 
     private static void handleAct(Player player, GameView view) {

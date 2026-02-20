@@ -10,18 +10,23 @@ import java.util.Random;
         public ArrayList<Scene> scenes = new ArrayList<>();
         public ArrayList<BoardSpace> boardSpaces = new ArrayList<>();
         public BoardSpace trailerSpace;
+        public BoardSpace castingOfficeSpace;
         public ArrayList<Scene> sceneDeck = new ArrayList<>();
         public int currentPlayerIndex = 0;
 
         // Setup the game board, players, and scenes
         void setupGame(int numPlayers) {
-            // Setup board spaces (including trailer)
+            // Setup board spaces (including trailer and casting office)
             // If boardSpaces is empty, load from XML
+            LoadXml loader = new LoadXml();
             if (boardSpaces.isEmpty()) {
-                LoadXml loader = new LoadXml();
                 boardSpaces.addAll(loader.loadBoardSpaces());
             }
-            // Find and set trailerSpace (assume trailer is named "trailer" or is the first space)
+            // Load scenes into sceneDeck if empty
+            if (sceneDeck.isEmpty()) {
+                sceneDeck.addAll(loader.loadScenes());
+            }
+            // Find and set trailerSpace (where players start each day)
             trailerSpace = null;
             for (BoardSpace space : boardSpaces) {
                 if (space.getId().equalsIgnoreCase("trailer")) {
@@ -31,6 +36,14 @@ import java.util.Random;
             }
             if (trailerSpace == null && !boardSpaces.isEmpty()) {
                 trailerSpace = boardSpaces.get(0); // fallback
+            }
+            // Find and set castingOfficeSpace (where players can upgrade rank)
+            castingOfficeSpace = null;
+            for (BoardSpace space : boardSpaces) {
+                if (space.getId().equalsIgnoreCase("Casting Office") || space.getType().equals("office")) {
+                    castingOfficeSpace = space;
+                    break;
+                }
             }
             // Setup players
             for (int i = 0; i < numPlayers; i++) {
@@ -135,6 +148,15 @@ import java.util.Random;
             }
         }
         return null; // Not found
+    }
+
+    //getters and setters to find trailer and casting office spaces
+    public BoardSpace getTrailerSpace() {
+        return trailerSpace;
+    }
+
+    public BoardSpace getCastingOfficeSpace() {
+        return castingOfficeSpace;
     }
 }
 

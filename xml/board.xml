@@ -4,7 +4,7 @@
     <neighbors>
       <neighbor name="Jail" />
       <neighbor name="General Store" />
-      <neighbor name="office" />
+      <neighbor name="Casting Office" />
     </neighbors>
     <area x="21" y="69" h="115" w="205" />
     <takes>
@@ -35,7 +35,7 @@
     <neighbors>
       <neighbor name="Church" />
       <neighbor name="Ranch" />
-      <neighbor name="office" />
+      <neighbor name="Casting Office" />
     </neighbors>
     <area x="27" y="732" h="115" w="205" />
     <takes>
@@ -192,7 +192,7 @@
   </set>
   <set name="Ranch">
     <neighbors>
-      <neighbor name="office" />
+      <neighbor name="Casting Office" />
       <neighbor name="General Store" />
       <neighbor name="Secret Hideout" />
       <neighbor name="Bank" />
