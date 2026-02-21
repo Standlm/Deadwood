@@ -171,9 +171,9 @@ public class Deadwood {
                 }
                 // different paths if we take an off card role
             } else if (choice >= roles.length && choice < offcardRoles.length+roles.length) {
-                boolean taken = player.takeRole(current, roles[choice-roles.length]);
+                boolean taken = player.takeRole(current, offcardRoles[choice-roles.length]);
                 if (taken) {
-                    view.printMessage("You took the role: " + roles[choice].getName());
+                    view.printMessage("You took the role: " + offcardRoles[choice-roles.length].getName());
                 } else {
                     view.printMessage("Could not take the role. Check your rank or if you already have a role.");
                 }
