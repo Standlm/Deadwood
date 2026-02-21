@@ -95,5 +95,8 @@ public class BoardSpace {
     }
     public boolean isCastingOffice() {
         return type.equals("office");
-    }   
+    } 
+    public boolean hasScene() {
+        return scene != null;
+    }
 }

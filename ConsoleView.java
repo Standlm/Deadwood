@@ -89,4 +89,12 @@ public class ConsoleView implements GameView {
     public int getUpgradeChoice() {
         return scanner.nextInt();
     }
+    public void printScenesLeft(List<BoardSpace> boardSpaces) {
+        System.out.println("\nScenes left on the board:");
+        for (BoardSpace space : boardSpaces) {
+            if (space.isSet() && space.hasScene()) {
+                System.out.println("- " + space.getScene().getName() + " at " + space.getId());
+            }
+        }
+    }
 } 

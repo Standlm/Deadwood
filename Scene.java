@@ -52,6 +52,9 @@ public class Scene {
     public int getNumShots() {
         return shotsLeft;
     }
+    public String getName() {
+        return sceneName;
+    }
      
 
 }

@@ -46,6 +46,7 @@ public class Deadwood {
                 view.printMessage("4. Rehearse");
                 view.printMessage("5. Upgrade Rank");
                 view.printMessage("6. End Turn");
+                view.printMessage("7. Print Scenes Left (Debug)");
 
                 int choice = -1;
                 try {
@@ -70,6 +71,7 @@ public class Deadwood {
                             view.printMessage("You must take a role before acting.");
                         } else {
                             handleAct(current, view);
+                            turnOver = true;
                         }
                         break;
                     case 4:
@@ -77,6 +79,7 @@ public class Deadwood {
                             view.printMessage("You must take a role before rehearsing.");
                         } else {
                             handleRehearse(current, view);
+                            turnOver = true;
                         }
                         break;
                     case 5:
@@ -87,6 +90,9 @@ public class Deadwood {
                         break;
                     case 6:
                         turnOver = true;
+                        break;
+                    case 7: // Debug option to print scenes left
+                        view.printScenesLeft(game.boardSpaces);
                         break;
                     default:
                         view.printMessage("Invalid choice.");
@@ -111,18 +117,20 @@ public class Deadwood {
                 Scene scene = destination.getScene();
                 if (scene != null) {
                     view.printMessage("Scene: " + scene.getSceneName() + " (Budget: " + scene.getBudget() + ")");
-                    Role[] roles = scene.roles;
-                    view.printMessage("Available roles on this scene:");
-                    for (int i = 0; i < roles.length; i++) {
-                        view.printMessage((i+1) + ". " + roles[i].getName() + " (Rank: " + roles[i].getRank() + ")");
+                    // Sort and display on-card roles
+                    Role[] onCardRoles = scene.roles.clone();
+                    java.util.Arrays.sort(onCardRoles, (a, b) -> a.getRank() - b.getRank());
+                    view.printMessage("Available on-card roles:");
+                    for (int i = 0; i < onCardRoles.length; i++) {
+                        view.printMessage((i+1) + ". " + onCardRoles[i].getName() + " (Rank: " + onCardRoles[i].getRank() + ")");
                     }
-                    //printing roles on the card
-                    Role[] offcardRoles = destination.getRoles();
-                    view.printMessage("Available roles on this card:");
+                    // Sort and display off-card roles
+                    Role[] offcardRoles = destination.getRoles().clone();
+                    java.util.Arrays.sort(offcardRoles, (a, b) -> a.getRank() - b.getRank());
+                    view.printMessage("Available off-card roles:");
                     for (int i = 0; i < offcardRoles.length; i++) {
                         view.printMessage((i+1) + ". " + offcardRoles[i].getName() + " (Rank: " + offcardRoles[i].getRank() + ")");
                     }
-
                 }
             }
         } else {
@@ -141,18 +149,20 @@ public class Deadwood {
                 view.printMessage("No scene available on this set.");
                 return;
             }
-            Role[] roles = scene.roles;
-            view.printMessage("Available roles:");
+            // Sort on-card roles by rank (ascending)
+            Role[] roles = scene.roles.clone();
+            java.util.Arrays.sort(roles, (a, b) -> a.getRank() - b.getRank());
+            view.printMessage("Available on-card roles:");
             for (int i = 0; i < roles.length; i++) {
                 view.printMessage((i+1) + ". " + roles[i].getName() + " (Rank: " + roles[i].getRank() + ")");
             }
-            //printing roles on the card
-            //is how we do but I think we need to add all roles to one list or accept inputs by like a bigger number    
-           Role[] offcardRoles = current.getRoles();
-                    view.printMessage("Available offcard roles on this scene:");
-                    for (int i = 0; i < offcardRoles.length; i++) {
-                        view.printMessage((roles.length + i +1) + ". " + offcardRoles[i].getName() + " (Rank: " + offcardRoles[i].getRank() + ")");
-                    }
+            // Sort off-card roles by rank (ascending)
+            Role[] offcardRoles = current.getRoles().clone();
+            java.util.Arrays.sort(offcardRoles, (a, b) -> a.getRank() - b.getRank());
+            view.printMessage("Available off-card roles:");
+            for (int i = 0; i < offcardRoles.length; i++) {
+                view.printMessage((roles.length + i + 1) + ". " + offcardRoles[i].getName() + " (Rank: " + offcardRoles[i].getRank() + ")");
+            }
         
             view.printMessage("Enter the number of the role you want to take:");
             int choice = -1;
@@ -236,16 +246,44 @@ public class Deadwood {
             return;
         }
         Scene scene = player.getCurrentSpace().getScene();
+        if (scene == null) {
+            view.printMessage("The scene has already wrapped. Your role has ended.");
+            player.resetRole();
+            return;
+        }
+        Role role = player.getRole();
+        boolean isOnCard = role.isOnCard();
         int dice = (int)(Math.random() * 6) + 1;
-        boolean success = scene.act(player.getRole(), dice);
+        boolean success = scene.act(role, dice);
         view.printMessage("Rolled: " + dice);
         if (success) {
             view.printMessage("Acting successful!");
+            if (isOnCard) {
+                // On-card role: 2 credits on success
+                player.addCredits(2);
+                view.printMessage("You earned 2 credits!");
+            } else {
+                // Off-card role: 1 credit + 1 dollar on success
+                player.addCredits(1);
+                player.addDollars(1);
+                view.printMessage("You earned 1 credit and 1 dollar!");
+            }
         } else {
             view.printMessage("Acting failed.");
+            if (!isOnCard) {
+                // Off-card role: 1 dollar on failure
+                player.addDollars(1);
+                view.printMessage("You earned 1 dollar.");
+            }
         }
         if (scene.isWrapped()) {
             view.printMessage("Scene wrapped!");
+            // Only on-card players get wrap bonuses (handled elsewhere if needed)
+            if (isOnCard) {
+                // On-card players could get bonus payout here
+            }
+            // Off-card roles do NOT get rewards for ending the scene
+            player.resetRole();
             player.getCurrentSpace().removeScene();
         }
     }
@@ -253,6 +291,12 @@ public class Deadwood {
     private static void handleRehearse(Player player, GameView view) {
         if (player.getRole() == null) {
             view.printMessage("You do not have a role.");
+            return;
+        }
+        Scene scene = player.getCurrentSpace().getScene();
+        if (scene == null) {
+            view.printMessage("The scene has already wrapped. Your role has ended.");
+            player.resetRole();
             return;
         }
         player.getRole().rehearse();

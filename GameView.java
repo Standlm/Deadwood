@@ -20,6 +20,9 @@ public interface GameView {
 
     // Actions
     String getActionChoice();
+    
+    //Print scenes left on the board
+    void printScenesLeft(List<BoardSpace> boardSpaces);
 
     // End of game
     void printWinner(List<Player> players);
