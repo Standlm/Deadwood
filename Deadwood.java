@@ -1,4 +1,3 @@
-import java.util.Scanner;
 
 public class Deadwood {
     public static void main(String[] args) {
@@ -117,6 +116,13 @@ public class Deadwood {
                     for (int i = 0; i < roles.length; i++) {
                         view.printMessage((i+1) + ". " + roles[i].getName() + " (Rank: " + roles[i].getRank() + ")");
                     }
+                    //printing roles on the card
+                    Role[] offcardRoles = destination.getRoles();
+                    view.printMessage("Available roles on this card:");
+                    for (int i = 0; i < offcardRoles.length; i++) {
+                        view.printMessage((i+1) + ". " + offcardRoles[i].getName() + " (Rank: " + offcardRoles[i].getRank() + ")");
+                    }
+
                 }
             }
         } else {
@@ -140,6 +146,14 @@ public class Deadwood {
             for (int i = 0; i < roles.length; i++) {
                 view.printMessage((i+1) + ". " + roles[i].getName() + " (Rank: " + roles[i].getRank() + ")");
             }
+            //printing roles on the card
+            //is how we do but I think we need to add all roles to one list or accept inputs by like a bigger number    
+           Role[] offcardRoles = current.getRoles();
+                    view.printMessage("Available offcard roles on this scene:");
+                    for (int i = 0; i < offcardRoles.length; i++) {
+                        view.printMessage((roles.length + i +1) + ". " + offcardRoles[i].getName() + " (Rank: " + offcardRoles[i].getRank() + ")");
+                    }
+        
             view.printMessage("Enter the number of the role you want to take:");
             int choice = -1;
             try {
@@ -150,6 +164,14 @@ public class Deadwood {
             }
             if (choice >= 0 && choice < roles.length) {
                 boolean taken = player.takeRole(scene, roles[choice]);
+                 if (taken) {
+                    view.printMessage("You took the role: " + roles[choice].getName());
+                } else {
+                    view.printMessage("Could not take the role. Check your rank or if you already have a role.");
+                }
+                // different paths if we take an off card role
+            } else if (choice >= roles.length && choice < offcardRoles.length+roles.length) {
+                boolean taken = player.takeRole(current, roles[choice-roles.length]);
                 if (taken) {
                     view.printMessage("You took the role: " + roles[choice].getName());
                 } else {

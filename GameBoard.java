@@ -1,6 +1,5 @@
 
 import java.util.ArrayList;
-    // code for starting the day
 import java.util.Collections;
 import java.util.Random;
 

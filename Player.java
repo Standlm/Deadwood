@@ -76,7 +76,23 @@ public class Player {
         }
 
         if (rank < role.getRank()) {
-            System.out.println("Your rank is too low for this role.");
+            System.out.println("Your rank is too low for this role. Role:" + role.getName());
+            return false;
+        }
+
+        this.currentRole = role;
+        return true;
+    }
+    //two different take roles one for the role on a space one for the role on a scene
+    public boolean takeRole(BoardSpace space, Role role) {
+
+        if (currentRole != null) {
+            System.out.println("You already have a role.");
+            return false;
+        }
+
+        if (rank < role.getRank()) {
+            System.out.println("Your rank is too low for this role. Role:" + role.getName());
             return false;
         }
 
