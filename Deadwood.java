@@ -142,58 +142,58 @@ public class Deadwood {
         }
     }
         // Handle taking a role
-        private static void handleTakeRole(Player player, GameView view) {
-            BoardSpace current = player.getCurrentSpace();
-            if (!current.isSet()) {
-                view.printMessage("You must be on a set to take a role.");
-                return;
-            }
-            Scene scene = current.getScene();
-            if (scene == null) {
-                view.printMessage("No scene available on this set.");
-                return;
-            }
-            // Sort on-card roles by rank (ascending)
-            Role[] roles = scene.roles.clone();
-            java.util.Arrays.sort(roles, (a, b) -> a.getRank() - b.getRank());
-            view.printMessage("Available on-card roles:");
-            for (int i = 0; i < roles.length; i++) {
-                view.printMessage((i+1) + ". " + roles[i].getName() + " (Rank: " + roles[i].getRank() + ")");
-            }
-            // Sort off-card roles by rank (ascending)
-            Role[] offcardRoles = current.getRoles().clone();
-            java.util.Arrays.sort(offcardRoles, (a, b) -> a.getRank() - b.getRank());
-            view.printMessage("Available off-card roles:");
-            for (int i = 0; i < offcardRoles.length; i++) {
-                view.printMessage((roles.length + i + 1) + ". " + offcardRoles[i].getName() + " (Rank: " + offcardRoles[i].getRank() + ")");
-            }
-        
-            view.printMessage("Enter the number of the role you want to take:");
-            int choice = -1;
-            try {
-                choice = Integer.parseInt(view.getActionChoice()) - 1;
-            } catch (Exception e) {
-                view.printMessage("Invalid input. Please enter a number.");
-                return;
-            }
-            if (choice >= 0 && choice < roles.length) {
-                boolean taken = player.takeRole(scene, roles[choice]);
-                 if (taken) {
-                    view.printMessage("You took the role: " + roles[choice].getName());
-                } else {
-                    view.printMessage("Could not take the role. Check your rank or if you already have a role.");
-                }
-                // different paths if we take an off card role
-            } else if (choice >= roles.length && choice < offcardRoles.length+roles.length) {
-                boolean taken = player.takeRole(current, offcardRoles[choice-roles.length]);
+    private static void handleTakeRole(Player player, GameView view) {
+        BoardSpace current = player.getCurrentSpace();
+        if (!current.isSet()) {
+            view.printMessage("You must be on a set to take a role.");
+            return;
+        }
+        Scene scene = current.getScene();
+        if (scene == null) {
+            view.printMessage("No scene available on this set.");
+            return;
+        }
+        // Sort on-card roles by rank (ascending)
+        Role[] roles = scene.roles.clone();
+        java.util.Arrays.sort(roles, (a, b) -> a.getRank() - b.getRank());
+        view.printMessage("Available on-card roles:");
+        for (int i = 0; i < roles.length; i++) {
+            view.printMessage((i+1) + ". " + roles[i].getName() + " (Rank: " + roles[i].getRank() + ")");
+        }
+        // Sort off-card roles by rank (ascending)
+        Role[] offcardRoles = current.getRoles().clone();
+        java.util.Arrays.sort(offcardRoles, (a, b) -> a.getRank() - b.getRank());
+        view.printMessage("Available off-card roles:");
+        for (int i = 0; i < offcardRoles.length; i++) {
+            view.printMessage((roles.length + i + 1) + ". " + offcardRoles[i].getName() + " (Rank: " + offcardRoles[i].getRank() + ")");
+        }
+    
+        view.printMessage("Enter the number of the role you want to take:");
+        int choice = -1;
+        try {
+            choice = Integer.parseInt(view.getActionChoice()) - 1;
+        } catch (Exception e) {
+            view.printMessage("Invalid input. Please enter a number.");
+            return;
+        }
+        if (choice >= 0 && choice < roles.length) {
+            boolean taken = player.takeRole(scene, roles[choice]);
                 if (taken) {
-                    view.printMessage("You took the role: " + offcardRoles[choice-roles.length].getName());
-                } else {
-                    view.printMessage("Could not take the role. Check your rank or if you already have a role.");
-                }
+                view.printMessage("You took the role: " + roles[choice].getName());
             } else {
-                view.printMessage("Invalid role choice.");
+                view.printMessage("Could not take the role. Check your rank or if you already have a role.");
             }
+            // different paths if we take an off card role
+        } else if (choice >= roles.length && choice < offcardRoles.length+roles.length) {
+            boolean taken = player.takeRole(current, offcardRoles[choice-roles.length]);
+            if (taken) {
+                view.printMessage("You took the role: " + offcardRoles[choice-roles.length].getName());
+            } else {
+                view.printMessage("Could not take the role. Check your rank or if you already have a role.");
+            }
+        } else {
+            view.printMessage("Invalid role choice.");
+        }
 
     }
     // Upgrade costs: [rank] -> {dollars, credits}

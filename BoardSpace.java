@@ -41,10 +41,10 @@ public class BoardSpace {
             }
         }
     }
-        // Return extras/roles for this set (or empty array)
-        public Role[] getRoles() {
-            return roles != null ? roles : new Role[0];
-        }
+    // Return extras/roles for this set (or empty array)
+    public Role[] getRoles() {
+        return roles != null ? roles : new Role[0];
+    }
     //make a trailer space for reset purposes
     public static BoardSpace createTrailerSpace() {
         String id = "Trailer";
