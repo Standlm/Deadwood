@@ -4,6 +4,7 @@ public class Role {
     private int rank;
     private String name;
     private int practiceShots;
+    private boolean occupied;
 
     // roles get sent in Name, rank, type, praticeShots
     public Role( String name, int rank, String type){
@@ -11,6 +12,7 @@ public class Role {
         this.rank = rank;
         this.type = type;
         this.practiceShots = 0;
+        this.occupied = false;
     }
 
     public static void main(String[] args) {
@@ -39,6 +41,22 @@ public class Role {
     // local value changer for practiceShots
     public void rehearse(){
         practiceShots++;
+    }
+
+    // Check if role is occupied
+    public boolean isOccupied() {
+        return occupied;
+    }
+
+    // Set role as occupied
+    public void setOccupied(boolean occupied) {
+        this.occupied = occupied;
+    }
+
+    // Reset role state (for when scene wraps or day ends)
+    public void reset() {
+        this.practiceShots = 0;
+        this.occupied = false;
     }
 
 

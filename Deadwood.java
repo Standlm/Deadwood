@@ -46,7 +46,7 @@ public class Deadwood {
                 view.printMessage("4. Rehearse");
                 view.printMessage("5. Upgrade Rank");
                 view.printMessage("6. End Turn");
-                view.printMessage("7. Print Scenes Left (Debug)");
+                view.printMessage("7. Print Scenes Left");
 
                 int choice = -1;
                 try {
@@ -71,6 +71,7 @@ public class Deadwood {
                             view.printMessage("You must take a role before acting.");
                         } else {
                             handleAct(current, view);
+                            checkAndEndDay(game, view);
                             turnOver = true;
                         }
                         break;
@@ -93,6 +94,9 @@ public class Deadwood {
                         break;
                     case 7: // Debug option to print scenes left
                         view.printScenesLeft(game.boardSpaces);
+                        break;
+                    case 8: // print player stats
+                        view.printPlayerStats(current);
                         break;
                     default:
                         view.printMessage("Invalid choice.");
@@ -129,7 +133,7 @@ public class Deadwood {
                     java.util.Arrays.sort(offcardRoles, (a, b) -> a.getRank() - b.getRank());
                     view.printMessage("Available off-card roles:");
                     for (int i = 0; i < offcardRoles.length; i++) {
-                        view.printMessage((i+1) + ". " + offcardRoles[i].getName() + " (Rank: " + offcardRoles[i].getRank() + ")");
+                        view.printMessage((i+1 + onCardRoles.length) + ". " + offcardRoles[i].getName() + " (Rank: " + offcardRoles[i].getRank() + ")");
                     }
                 }
             }
@@ -286,6 +290,17 @@ public class Deadwood {
             player.resetRole();
             player.getCurrentSpace().removeScene();
         }
+    }
+
+    // Check if only 1 scene left and end day if so (call from main game loop)
+    private static boolean checkAndEndDay(GameBoard game, GameView view) {
+        if (game.shouldEndDay()) {
+            view.printMessage("\nOnly 1 scene left! Day " + game.getCurrentDay() + " is ending...");
+            game.startDay();
+            view.printMessage("Day " + game.getCurrentDay() + " begins!");
+            return true;
+        }
+        return false;
     }
 
     private static void handleRehearse(Player player, GameView view) {

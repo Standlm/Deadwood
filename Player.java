@@ -75,12 +75,18 @@ public class Player {
             return false;
         }
 
+        if (role.isOccupied()) {
+            System.out.println("This role is already taken.");
+            return false;
+        }
+
         if (rank < role.getRank()) {
             System.out.println("Your rank is too low for this role. Role:" + role.getName());
             return false;
         }
 
         this.currentRole = role;
+        role.setOccupied(true);
         return true;
     }
     //two different take roles one for the role on a space one for the role on a scene
@@ -91,12 +97,18 @@ public class Player {
             return false;
         }
 
+        if (role.isOccupied()) {
+            System.out.println("This role is already taken.");
+            return false;
+        }
+
         if (rank < role.getRank()) {
             System.out.println("Your rank is too low for this role. Role:" + role.getName());
             return false;
         }
 
         this.currentRole = role;
+        role.setOccupied(true);
         return true;
     }
 
@@ -105,6 +117,10 @@ public class Player {
     // -----------------------
 
     public void resetRole() {
+        if (currentRole != null) {
+            currentRole.setOccupied(false);
+            currentRole.reset();
+        }
         currentRole = null;
     }
 

@@ -157,6 +157,22 @@ import java.util.Random;
     public BoardSpace getCastingOfficeSpace() {
         return castingOfficeSpace;
     }
+
+    // Count active scenes remaining on the board
+    public int getActiveScenesCount() {
+        int count = 0;
+        for (BoardSpace space : boardSpaces) {
+            if (space.isSet() && space.getScene() != null) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    // Check if day should end (1 or fewer scenes left)
+    public boolean shouldEndDay() {
+        return getActiveScenesCount() <= 1;
+    }
 }
 
 
