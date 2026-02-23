@@ -70,7 +70,7 @@ public class Deadwood {
                         if (current.getRole() == null) {
                             view.printMessage("You must take a role before acting.");
                         } else {
-                            gameRef = game; // Store reference for wrap handling
+                            gameboard = game; // Store reference for wrap handling
                             handleAct(current, view);
                             checkAndEndDay(game, view);
                             turnOver = true;
@@ -245,7 +245,7 @@ public class Deadwood {
         }
     }
 
-    private static GameBoard gameRef; // Reference to game for wrap handling
+    private static GameBoard gameboard ; // Reference to game for wrap handling
 
     private static void handleAct(Player player, GameView view) {
         if (player.getRole() == null) {
@@ -285,7 +285,7 @@ public class Deadwood {
         }
         if (scene.isWrapped()) {
             view.printMessage("Scene wrapped!");
-            handleSceneWrap(gameRef, player.getCurrentSpace(), scene, view);
+            handleSceneWrap(gameboard, player.getCurrentSpace(), scene, view);
         }
     }
 
