@@ -1,7 +1,9 @@
 # Deadwood
+## By Malik Standley & Joshua L. Cary
+### CSCI 345 Winter 2026
 In the board game Deadwood, gameplay is structured around a series of four distinct days. Each day concludes when only a single film remains in play. At this point, the final film does not finish, and players return to the trailers as the map is reset for the next day.
 
-Currently, Role.java and BoardSpace.java are implemented, with Deadwood.java being compilable and ready to demonstrate those classes.
+Currently, everything is implemented.
 
 # Links
 #### [Class Diagram](https://docs.google.com/document/d/1lDRwtjGfXOVCj1rF3nigKJXXSnu5qpwhnqIu_Vciy40/edit?usp=sharing)
