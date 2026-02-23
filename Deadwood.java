@@ -70,6 +70,7 @@ public class Deadwood {
                         if (current.getRole() == null) {
                             view.printMessage("You must take a role before acting.");
                         } else {
+                            gameRef = game; // Store reference for wrap handling
                             handleAct(current, view);
                             checkAndEndDay(game, view);
                             turnOver = true;
@@ -244,6 +245,8 @@ public class Deadwood {
         }
     }
 
+    private static GameBoard gameRef; // Reference to game for wrap handling
+
     private static void handleAct(Player player, GameView view) {
         if (player.getRole() == null) {
             view.printMessage("You do not have a role.");
@@ -282,14 +285,74 @@ public class Deadwood {
         }
         if (scene.isWrapped()) {
             view.printMessage("Scene wrapped!");
-            // Only on-card players get wrap bonuses (handled elsewhere if needed)
-            if (isOnCard) {
-                // On-card players could get bonus payout here
-            }
-            // Off-card roles do NOT get rewards for ending the scene
-            player.resetRole();
-            player.getCurrentSpace().removeScene();
+            handleSceneWrap(gameRef, player.getCurrentSpace(), scene, view);
         }
+    }
+
+    // Handle scene wrap bonus payout per Deadwood rules
+    private static void handleSceneWrap(GameBoard game, BoardSpace space, Scene scene, GameView view) {
+        // Find all players working on this scene/space
+        java.util.List<Player> onCardPlayers = new java.util.ArrayList<>();
+        java.util.List<Player> offCardPlayers = new java.util.ArrayList<>();
+        
+        // checks if players are on the scene and categorizes them as on-card or off-card 
+        for (Player p : game.players) {
+            if (p.getRole() != null && p.getCurrentSpace() == space) {
+                if (p.getRole().isOnCard()) {
+                    onCardPlayers.add(p);
+                } else {
+                    offCardPlayers.add(p);
+                }
+            }
+        }
+        
+        // If no on-card players, no bonus payout occurs
+        if (onCardPlayers.isEmpty()) {
+            view.printMessage("No on-card players - no bonus payout.");
+        } else {
+            // Roll dice equal to the scene's budget
+            Dice diceRoller = new Dice();
+            int[] rolls = diceRoller.rollDice(scene.getBudget());
+            
+            // Sort dice highest to lowest
+            java.util.Arrays.sort(rolls);
+            // Reverse to get descending order
+            for (int i = 0; i < rolls.length / 2; i++) {
+                int temp = rolls[i];
+                rolls[i] = rolls[rolls.length - 1 - i];
+                rolls[rolls.length - 1 - i] = temp;
+            }
+            
+            // Sort on-card players by role rank (highest first)
+            onCardPlayers.sort((a, b) -> b.getRole().getRank() - a.getRole().getRank());
+            
+            // Distribute dice to on-card players in round-robin fashion
+            // Starting from highest rank, going around
+            for (int i = 0; i < rolls.length; i++) {
+                int playerIndex = i % onCardPlayers.size();
+                Player p = onCardPlayers.get(playerIndex);
+                p.addDollars(rolls[i]);
+                view.printMessage(p.getName() + " (" + p.getRole().getName() + ") earned $" + rolls[i] + " bonus!");
+            }
+            
+            // Pay off-card players dollars equal to their role's rank
+            for (Player p : offCardPlayers) {
+                int bonus = p.getRole().getRank();
+                p.addDollars(bonus);
+                view.printMessage(p.getName() + " (off-card: " + p.getRole().getName() + ") earned $" + bonus + " bonus!");
+            }
+        }
+        
+        // Reset ALL players working on this scene
+        for (Player p : onCardPlayers) {
+            p.resetRole();
+        }
+        for (Player p : offCardPlayers) {
+            p.resetRole();
+        }
+        
+        // Remove the scene from the space
+        space.removeScene();
     }
 
     // Check if only 1 scene left and end day if so (call from main game loop)
