@@ -38,6 +38,9 @@ public class Deadwood {
             view.printPlayerStats(current);
 
             boolean turnOver = false;
+            boolean hasMoved = false;
+            boolean tookRoleThisTurn = false;
+            
             while (!turnOver) {
                 view.printMessage("\nChoose action:");
                 view.printMessage("1. Move");
@@ -47,6 +50,8 @@ public class Deadwood {
                 view.printMessage("5. Upgrade Rank");
                 view.printMessage("6. End Turn");
                 view.printMessage("7. Print Scenes Left");
+                view.printMessage("8. View All Player Locations");
+                view.printMessage("9. Quit Game");
 
                 int choice = -1;
                 try {
@@ -58,17 +63,35 @@ public class Deadwood {
 
                 switch (choice) {
                     case 1:
-                        handleMove(game, current, view);
+                        if (current.getRole() != null) {
+                            view.printMessage("You cannot move while working a role.");
+                        } else if (hasMoved) {
+                            view.printMessage("You can only move once per turn.");
+                        } else {
+                            boolean moved = handleMove(game, current, view);
+                            if (moved) {
+                                hasMoved = true;
+                            }
+                        }
                         break;
                     case 2:
-                        handleTakeRole(current, view);
-                        view.printCurrentDayAndTurn(game.getCurrentDay(), current);
-                        view.printPlayerTurnStart(current);
-                        view.printPlayerStats(current);
+                        if (tookRoleThisTurn) {
+                            view.printMessage("You already took a role this turn.");
+                        } else {
+                            boolean took = handleTakeRole(current, view);
+                            if (took) {
+                                tookRoleThisTurn = true;
+                            }
+                            view.printCurrentDayAndTurn(game.getCurrentDay(), current);
+                            view.printPlayerTurnStart(current);
+                            view.printPlayerStats(current);
+                        }
                         break;
                     case 3:
                         if (current.getRole() == null) {
                             view.printMessage("You must take a role before acting.");
+                        } else if (tookRoleThisTurn) {
+                            view.printMessage("You cannot act on the same turn you took a role.");
                         } else {
                             gameboard = game; // Store reference for wrap handling
                             handleAct(current, view);
@@ -79,9 +102,13 @@ public class Deadwood {
                     case 4:
                         if (current.getRole() == null) {
                             view.printMessage("You must take a role before rehearsing.");
+                        } else if (tookRoleThisTurn) {
+                            view.printMessage("You cannot rehearse on the same turn you took a role.");
                         } else {
-                            handleRehearse(current, view);
-                            turnOver = true;
+                            boolean rehearsed = handleRehearse(current, view);
+                            if (rehearsed) {
+                                turnOver = true;
+                            }
                         }
                         break;
                     case 5:
@@ -96,8 +123,22 @@ public class Deadwood {
                     case 7: // Debug option to print scenes left
                         view.printScenesLeft(game.boardSpaces);
                         break;
-                    case 8: // print player stats
-                        view.printPlayerStats(current);
+                    case 8: // View all player locations
+                        printAllPlayerLocations(game, view);
+                        break;
+                    case 9: // Quit game
+                        view.printMessage("Are you sure you want to quit? (1 = Yes, 2 = No)");
+                        try {
+                            int confirm = Integer.parseInt(view.getActionChoice());
+                            if (confirm == 1) {
+                                view.printMessage("Game ended early. Final scores:");
+                                game.calculateScores();
+                                view.printWinner(game.players);
+                                return; // Exit runGame
+                            }
+                        } catch (Exception e) {
+                            view.printMessage("Continuing game...");
+                        }
                         break;
                     default:
                         view.printMessage("Invalid choice.");
@@ -105,10 +146,22 @@ public class Deadwood {
             }
             game.nextTurn();
         }
+    }
     
+    private static void printAllPlayerLocations(GameBoard game, GameView view) {
+        view.printMessage("\n--- All Player Locations ---");
+        for (Player p : game.players) {
+            String location = p.getCurrentSpace() != null ? p.getCurrentSpace().getId() : "Unknown";
+            String roleInfo = "";
+            if (p.getRole() != null) {
+                roleInfo = " (Role: " + p.getRole().getName() + ")";
+            }
+            view.printMessage(p.getName() + ": " + location + roleInfo);
+        }
+        view.printMessage("-----------------------------");
     }
 
-    private static void handleMove(GameBoard game, Player player, GameView view) {
+    private static boolean handleMove(GameBoard game, Player player, GameView view) {
         BoardSpace current = player.getCurrentSpace();
         String[] neighbors = current.getNeighbors();
         view.printMoveOptions(neighbors);
@@ -138,21 +191,23 @@ public class Deadwood {
                     }
                 }
             }
+            return true;
         } else {
             view.printMessage("Invalid move.");
+            return false;
         }
     }
-        // Handle taking a role
-    private static void handleTakeRole(Player player, GameView view) {
+    // Handle taking a role - returns true if role was successfully taken
+    private static boolean handleTakeRole(Player player, GameView view) {
         BoardSpace current = player.getCurrentSpace();
         if (!current.isSet()) {
             view.printMessage("You must be on a set to take a role.");
-            return;
+            return false;
         }
         Scene scene = current.getScene();
         if (scene == null) {
             view.printMessage("No scene available on this set.");
-            return;
+            return false;
         }
         // Sort on-card roles by rank (ascending)
         Role[] roles = scene.roles.clone();
@@ -175,27 +230,31 @@ public class Deadwood {
             choice = Integer.parseInt(view.getActionChoice()) - 1;
         } catch (Exception e) {
             view.printMessage("Invalid input. Please enter a number.");
-            return;
+            return false;
         }
         if (choice >= 0 && choice < roles.length) {
             boolean taken = player.takeRole(scene, roles[choice]);
-                if (taken) {
+            if (taken) {
                 view.printMessage("You took the role: " + roles[choice].getName());
+                return true;
             } else {
                 view.printMessage("Could not take the role. Check your rank or if you already have a role.");
+                return false;
             }
             // different paths if we take an off card role
         } else if (choice >= roles.length && choice < offcardRoles.length+roles.length) {
             boolean taken = player.takeRole(current, offcardRoles[choice-roles.length]);
             if (taken) {
                 view.printMessage("You took the role: " + offcardRoles[choice-roles.length].getName());
+                return true;
             } else {
                 view.printMessage("Could not take the role. Check your rank or if you already have a role.");
+                return false;
             }
         } else {
             view.printMessage("Invalid role choice.");
+            return false;
         }
-
     }
     // Upgrade costs: [rank] -> {dollars, credits}
     private static final int[][] UPGRADE_COSTS = {
@@ -366,18 +425,27 @@ public class Deadwood {
         return false;
     }
 
-    private static void handleRehearse(Player player, GameView view) {
+    // Handle rehearsing - returns true if rehearsal was successful
+    private static boolean handleRehearse(Player player, GameView view) {
         if (player.getRole() == null) {
             view.printMessage("You do not have a role.");
-            return;
+            return false;
         }
         Scene scene = player.getCurrentSpace().getScene();
         if (scene == null) {
             view.printMessage("The scene has already wrapped. Your role has ended.");
             player.resetRole();
-            return;
+            return false;
+        }
+        // Cap rehearsals: if practice shots + 1 >= budget, guaranteed success, no more rehearsing
+        int currentPractice = player.getRole().getPracticeShots();
+        int budget = scene.getBudget();
+        if (currentPractice + 1 >= budget) {
+            view.printMessage("You already have guaranteed success (practice shots: " + currentPractice + ", budget: " + budget + "). You cannot rehearse anymore.");
+            return false;
         }
         player.getRole().rehearse();
         view.printMessage("Rehearsed. Practice shots: " + player.getRole().getPracticeShots());
+        return true;
     }
 }
