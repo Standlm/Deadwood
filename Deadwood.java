@@ -3,33 +3,68 @@ public class Deadwood {
     public static void main(String[] args) {
         GameBoard game = new GameBoard();
         LoadXml loader = new LoadXml();
-        GameView view = new ConsoleView();
-
-        // Load XML data into GameBoard
-        loader.loadGameData(game);
-
-        view.printMessage("Enter number of players (2–8): ");
-        int numPlayers = -1;
-        while (numPlayers < 2 || numPlayers > 8) {
-            try {
-                numPlayers = Integer.parseInt(view.getActionChoice());
-                if (numPlayers < 2 || numPlayers > 8) {
-                    view.printMessage("Please enter a number between 2 and 8.");
-                }
-            } catch (Exception e) {
-                view.printMessage("Invalid input. Please enter a number between 2 and 8.");
+        
+        // Check for GUI mode via command line argument
+        boolean useGui = false;
+        for (String arg : args) {
+            if (arg.equalsIgnoreCase("--gui") || arg.equalsIgnoreCase("-g")) {
+                useGui = true;
+                break;
             }
         }
+        
+        // Load XML data into GameBoard
+        loader.loadGameData(game);
+        
+        if (useGui) {
+            // For GUI mode, run game loop in background thread
+            GuiView guiView = new GuiView();
+            guiView.setGameBoard(game);
 
-        game.setupGame(numPlayers);
+            guiView.printMessage("Select player count in Setup and click Start Game.");
+            int numPlayers = guiView.waitForPlayerCount();
+            if (numPlayers < 2) {
+                System.exit(0);
+                return;
+            }
+            
+            game.setupGame(numPlayers);
+            guiView.updateBoard();
+            
+            // Run game in background thread to keep GUI responsive
+            Thread gameThread = new Thread(() -> {
+                runGame(game, guiView);
+                guiView.printMessage("\nGame Over!");
+                game.calculateScores();
+                guiView.printWinner(game.players);
+            });
+            gameThread.start();
+        } else {
+            // Console mode runs on main thread
+            GameView view = new ConsoleView();
+            
+            view.printMessage("Enter number of players (2–8): ");
+            int numPlayers = -1;
+            while (numPlayers < 2 || numPlayers > 8) {
+                try {
+                    numPlayers = Integer.parseInt(view.getActionChoice());
+                    if (numPlayers < 2 || numPlayers > 8) {
+                        view.printMessage("Please enter a number between 2 and 8.");
+                    }
+                } catch (Exception e) {
+                    view.printMessage("Invalid input. Please enter a number between 2 and 8.");
+                }
+            }
 
-        runGame(game, view);
+            game.setupGame(numPlayers);
+            runGame(game, view);
 
-        view.printMessage("\nGame Over!");
-        game.calculateScores();
-        view.printWinner(game.players);
+            view.printMessage("\nGame Over!");
+            game.calculateScores();
+            view.printWinner(game.players);
+        }
     }
-
+    
     private static void runGame(GameBoard game, GameView view) {
         while (!game.isGameOver()) {
             Player current = game.getCurrentPlayer();
@@ -71,6 +106,7 @@ public class Deadwood {
                             boolean moved = handleMove(game, current, view);
                             if (moved) {
                                 hasMoved = true;
+                                if (view instanceof GuiView) ((GuiView) view).updateBoard();
                             }
                         }
                         break;
@@ -81,6 +117,7 @@ public class Deadwood {
                             boolean took = handleTakeRole(current, view);
                             if (took) {
                                 tookRoleThisTurn = true;
+                                if (view instanceof GuiView) ((GuiView) view).updateBoard();
                             }
                             view.printCurrentDayAndTurn(game.getCurrentDay(), current);
                             view.printPlayerTurnStart(current);
@@ -95,7 +132,9 @@ public class Deadwood {
                         } else {
                             gameboard = game; // Store reference for wrap handling
                             handleAct(current, view);
+                            if (view instanceof GuiView) ((GuiView) view).updateBoard();
                             checkAndEndDay(game, view);
+                            if (view instanceof GuiView) ((GuiView) view).updateBoard();
                             turnOver = true;
                         }
                         break;
@@ -107,12 +146,14 @@ public class Deadwood {
                         } else {
                             boolean rehearsed = handleRehearse(current, view);
                             if (rehearsed) {
+                                if (view instanceof GuiView) ((GuiView) view).updateBoard();
                                 turnOver = true;
                             }
                         }
                         break;
                     case 5:
                         handleUpgradeRank(current, view);
+                        if (view instanceof GuiView) ((GuiView) view).updateBoard();
                         view.printCurrentDayAndTurn(game.getCurrentDay(), current);
                         view.printPlayerTurnStart(current);
                         view.printPlayerStats(current);
@@ -127,17 +168,24 @@ public class Deadwood {
                         printAllPlayerLocations(game, view);
                         break;
                     case 9: // Quit game
-                        view.printMessage("Are you sure you want to quit? (1 = Yes, 2 = No)");
-                        try {
-                            int confirm = Integer.parseInt(view.getActionChoice());
-                            if (confirm == 1) {
-                                view.printMessage("Game ended early. Final scores:");
-                                game.calculateScores();
-                                view.printWinner(game.players);
-                                return; // Exit runGame
+                        int confirm = 2;
+                        if (view instanceof GuiView) {
+                            String[] quitOptions = {"Yes, quit", "No, continue"};
+                            int selected = ((GuiView) view).getOptionChoice("Quit the game?", quitOptions);
+                            confirm = selected == 0 ? 1 : 2;
+                        } else {
+                            view.printMessage("Are you sure you want to quit? (1 = Yes, 2 = No)");
+                            try {
+                                confirm = Integer.parseInt(view.getActionChoice());
+                            } catch (Exception e) {
+                                view.printMessage("Continuing game...");
                             }
-                        } catch (Exception e) {
-                            view.printMessage("Continuing game...");
+                        }
+                        if (confirm == 1) {
+                            view.printMessage("Game ended early. Final scores:");
+                            game.calculateScores();
+                            view.printWinner(game.players);
+                            return; // Exit runGame
                         }
                         break;
                     default:
@@ -174,6 +222,9 @@ public class Deadwood {
             if (destination.isSet()) {
                 Scene scene = destination.getScene();
                 if (scene != null) {
+                    if (view instanceof GuiView) {
+                        ((GuiView) view).revealSet(destination.getId());
+                    }
                     view.printMessage("Scene: " + scene.getSceneName() + " (Budget: " + scene.getBudget() + ")");
                     // Sort and display on-card roles
                     Role[] onCardRoles = scene.roles.clone();
@@ -226,11 +277,22 @@ public class Deadwood {
     
         view.printMessage("Enter the number of the role you want to take:");
         int choice = -1;
-        try {
-            choice = Integer.parseInt(view.getActionChoice()) - 1;
-        } catch (Exception e) {
-            view.printMessage("Invalid input. Please enter a number.");
-            return false;
+        if (view instanceof GuiView) {
+            java.util.List<String> roleOptions = new java.util.ArrayList<>();
+            for (Role role : roles) {
+                roleOptions.add(role.getName() + " (On-card, rank " + role.getRank() + ")");
+            }
+            for (Role role : offcardRoles) {
+                roleOptions.add(role.getName() + " (Off-card, rank " + role.getRank() + ")");
+            }
+            choice = ((GuiView) view).getOptionChoice("Select a role:", roleOptions.toArray(new String[0]));
+        } else {
+            try {
+                choice = Integer.parseInt(view.getActionChoice()) - 1;
+            } catch (Exception e) {
+                view.printMessage("Invalid input. Please enter a number.");
+                return false;
+            }
         }
         if (choice >= 0 && choice < roles.length) {
             boolean taken = player.takeRole(scene, roles[choice]);
@@ -282,11 +344,20 @@ public class Deadwood {
             // Ask if they want to pay with dollars or credits
             view.printMessage("Pay with: 1. Dollars ($" + dollarCost + ")\n or 2. Credits (" + creditCost + ")");
             int payChoice = -1;
-            try {
-                payChoice = Integer.parseInt(view.getActionChoice());
-            } catch (Exception e) {
-                view.printMessage("Invalid input.");
-                return;
+            if (view instanceof GuiView) {
+                String[] payOptions = {
+                    "Dollars ($" + dollarCost + ")",
+                    "Credits (" + creditCost + ")"
+                };
+                int selected = ((GuiView) view).getOptionChoice("Choose payment method:", payOptions);
+                payChoice = selected == 0 ? 1 : (selected == 1 ? 2 : -1);
+            } else {
+                try {
+                    payChoice = Integer.parseInt(view.getActionChoice());
+                } catch (Exception e) {
+                    view.printMessage("Invalid input.");
+                    return;
+                }
             }
             
             boolean useDollars = (payChoice == 1);
