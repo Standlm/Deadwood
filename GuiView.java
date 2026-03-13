@@ -566,6 +566,7 @@ public class GuiView extends JFrame implements GameView {
 
     @Override
     public int getUpgradeChoice() {
+        // Determine current player's rank to filter valid upgrade options
         Player current = gameBoard != null ? gameBoard.getCurrentPlayer() : null;
         int currentRank = current != null ? current.getRank() : 1;
         
@@ -632,7 +633,7 @@ public class GuiView extends JFrame implements GameView {
         }
         
         if (winner != null) {
-            sb.append("\n WINNER: " + winner.getName() + " 🏆");
+            sb.append("\nWINNER: " + winner.getName() + " 🏆");
         }
         
         printMessage(sb.toString());
