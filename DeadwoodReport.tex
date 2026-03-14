@@ -1,4 +1,3 @@
-
 \documentclass[12pt]{article}
 
 % Math tools:
@@ -16,20 +15,12 @@
 \usepackage{subcaption}
 
 % Footnote Formatting
-\usepackage[compact]{titlesec}
-\usepackage{scrextend}
-\usepackage{enumitem} %Footnote Formatting
-\usepackage{listings} %Footnote Formatting
-\setlist{nolistsep, noitemsep}
-\setlength{\footnotesep}{1.2\baselineskip}
-\deffootnote[.2in]{0in}{0em}{\normalsize\thefootnotemark.\enskip}
+
 % This will give a warning because we've changed a command^
 % This is okay however.
 
 % Section Formatting 
 \def\ci{\perp\!\!\!\perp}
-\titleformat*{\section}{\large\bfseries}
-\titleformat*{\subsection}{\normalsize\bfseries}
 
 %
 
@@ -68,11 +59,11 @@ Solid design principles were a main factor in making our code more understandabl
 	
 	 Open Close Principle Is demonstrated With the implementation Of gui. We set it up so we can make abstract calls in our Deadwood Controller while not changing our Model classes (Players,Role, Scene..) 
 
-Liskovs Substitution Principle is shown
+Liskov's Substitution Principle is shown through ConsoleView and GuiView both implementing GameView. The controller is written entirely against the GameView interface and works correctly with either substitution. Passing a ConsoleView or a GuiView into runGame() produces the same game-flow behavior, satisfying Liskov's requirement that subtypes must be behaviorally substitutable for their base type.
 
-We Demostrate  Interface Segregration by implementing our GameView Class as an Interface that is later defined seperate in either ConsoleView or GuiView.
+We demonstrate Interface Segregation by implementing our GameView class as an interface that is later defined separately in either ConsoleView or GuiView. GameView only declares the methods the controller actually needs, so neither implementing class is forced to depend on methods it does not use.
 
-Depenency Inversion Principle is used within
+Dependency Inversion Principle is used within the Deadwood controller, which depends on the abstract GameView interface rather than on ConsoleView or GuiView directly. This means high-level game logic is decoupled from the concrete rendering implementation.
 
 \textbf {Object Oriented Principles} \\
 Compile Time Polymorphism (Overloading) :
@@ -105,7 +96,14 @@ Other classes cannot directly change those fields; they must use public methods 
 
 \textbf{Unimplemented Design Patterns}\\
 
+\textbf{Singleton.}
+The Singleton pattern was not implemented in our project. The most natural candidate would have been GameBoard, since there is only ever one board per game session. A Singleton GameBoard would guarantee that all classes (Deadwood, GuiView, LoadXml) reference the same instance without passing it around as a parameter. We chose not to implement it because explicit constructor injection made testing and reasoning about state easier, and Singleton can introduce hidden global state that is difficult to reset between tests.
 
+\textbf{Observer.}
+The game currently uses a direct-call model where the controller explicitly calls view.updateBoard() and view.printPlayerStats() after each action. A proper Observer implementation would have GameBoard maintain a list of listeners and broadcast change events whenever state mutated. GuiView would register as a listener and repaint automatically, removing the need for the controller to manually synchronize model and view.
+
+\textbf{Command.}
+Player actions (Move, Take Role, Act, Rehearse, Upgrade) are handled as switch cases inside the game loop in Deadwood.runGame(). Wrapping each action in a Command object with an execute() method would cleanly separate input parsing from business logic and open the door to undo/redo support.
 
 
 %-------------------------------------------------------------
