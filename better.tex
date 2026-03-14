@@ -1,0 +1,113 @@
+
+\documentclass[12pt]{article}
+
+% Math tools:
+\usepackage{amsfonts, amsmath, amsthm, amssymb} 
+\usepackage[utf8]{inputenc}
+% Set margins:
+\usepackage[top = 1in, left = 1in, right = 1in, bottom = 1in]{geometry}
+\usepackage{setspace}
+
+% Hides hyperlink red box:
+\usepackage[bookmarks = false, hidelinks]{hyperref} 
+
+% Aids float of tables/figures:
+\usepackage{float}
+\usepackage{subcaption}
+
+% Footnote Formatting
+\usepackage[compact]{titlesec}
+\usepackage{scrextend}
+\usepackage{enumitem} %Footnote Formatting
+\usepackage{listings} %Footnote Formatting
+\setlist{nolistsep, noitemsep}
+\setlength{\footnotesep}{1.2\baselineskip}
+\deffootnote[.2in]{0in}{0em}{\normalsize\thefootnotemark.\enskip}
+% This will give a warning because we've changed a command^
+% This is okay however.
+
+% Section Formatting 
+\def\ci{\perp\!\!\!\perp}
+\titleformat*{\section}{\large\bfseries}
+\titleformat*{\subsection}{\normalsize\bfseries}
+
+%
+
+%----------------- Indents, Page Numbering --------------------
+
+\pagestyle{plain}
+\begin{document}
+% Comment this (%) if you prefer indents: 
+\setlength{\parindent}{10pt}
+\setcounter{page}{1}
+\singlespacing 
+
+%--------------------Document Content--------------------------
+% Header:
+\begin{center}
+\textbf{Deadwood Final Report}\\
+Joshua Cary, Malik Standley
+\end{center}
+% Double spaced content:
+\doublespacing
+
+% Add a list:
+\textbf{Contents of Report}
+\begin{list}{}{}
+\item[Solid Design Principles.] 
+\item[Object Oriented Principles.]
+\item[Design Patterns.]
+\end{list}
+
+\textbf {Solid Design Principles} \\
+
+Solid design principles were a main factor in making our code more understandable and scalabe as making the game went on. 
+	The first Design principle is Single Responsibility, Single Responsibility is especiially important in programs with Larger Class systesms because without clear designed Classes our classes end becoming bloated.
+	
+	 A positve example of Single repsonsibility in our program is within Classes Like Player and role where our classes have the sole purpose of holding our data, and using standard getters and setters. The Player and role Class handle their own behavior like UpgradeRank() and addDollars() but they dont know how this will be used that is up for other classes to decide. A negative Example of single responsibility is in GuiView, GuiView Being created later in the assignment is an example when you dont plan out what data classes need and the interactions they need with other cards. their is some Division of responsibilities with sceneCardCatalog and LoadGui. We seperate the Builder Elements but their is still Gui elements mixed in with the Implentation of the interface.
+	
+	 Open Close Principle Is demonstrated With the implementation Of gui. We set it up so we can make abstract calls in our Deadwood Controller while not changing our Model classes (Players,Role, Scene..) 
+
+Liskovs Substitution Principle is shown
+
+We Demostrate  Interface Segregration by implementing our GameView Class as an Interface that is later defined seperate in either ConsoleView or GuiView.
+
+Depenency Inversion Principle is used within
+
+\textbf {Object Oriented Principles} \\
+Compile Time Polymorphism (Overloading) :
+
+Examples:
+TakeRole(BoardSpace.space,Role.role) \\
+TakeRole(Scene scene, Role role) 
+
+This is an example of overloading because our takerole can work for different argument types in different ways. BoardSpace roles are loaded as off-card roles, while scene roles are on the card.
+
+Encapsulation
+
+Encapsulation is demonstrated in the Player class because important state is private, such as name, rank, dollars, and credits in Player.java
+
+Other classes cannot directly change those fields; they must use public methods like getters and controlled updates
+
+\textbf{Implemented Design Patterns}\\
+    Single Responsibility Principles
+
+    As the project neared completion, adherence to the Single Responsibility Principle began to diminish. Rather than  assigning distinct responsibilities to classes and planning their roles in advance, we added new classes as required to make the GUI function. Consequently, the GuiView component came to serve both as the loader and the user interface, confusing distinct responsibilities within a single class.
+    We addressed these issues by separating the loading functionality into a distinct LoadGui class dedicated to XML parsing. Additionally, we developed a separate SceneBoard class to store card information and manage their locations on the board.
+
+    
+
+    Implementing Model View Controller:
+
+    Introducing the Model-View-Controller (MVC) architecture later in Assignment 2 initially slowed our progress. Adapting the Deadwood system to function through a separate interface required significant changes. However, this interface ultimately facilitated information display and streamlined the implementation of the GUI view. Having a predefined interface also allowed us to incorporate checks for various paths in the game flow to display the GUI, rather than modifying the entire program.
+
+
+
+\textbf{Unimplemented Design Patterns}\\
+
+
+
+
+%-------------------------------------------------------------
+\end{document}
+
