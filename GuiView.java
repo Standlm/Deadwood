@@ -5,11 +5,11 @@ import java.io.File;
 import java.util.*;
 import java.util.List;
 import javax.imageio.ImageIO;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
+// import javax.xml.parsers.DocumentBuilder;
+// import javax.xml.parsers.DocumentBuilderFactory;
+// import org.w3c.dom.Document;
+// import org.w3c.dom.Element;
+// import org.w3c.dom.NodeList;
 
 public class GuiView extends JFrame implements GameView {
 
@@ -127,7 +127,12 @@ public class GuiView extends JFrame implements GameView {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
         
-        loadImages();
+        GuiAssets assets = LoadGui.load(PLAYER_COLORS);
+        this.shotImage = assets.shotImage;
+        this.cardBackImage = assets.cardBackImage;
+        this.diceImages = assets.diceImages;
+        this.offCardRoleCoords.putAll(assets.offCardRoleCoords);
+        this.onCardRoleCoords.putAll(assets.onCardRoleCoords);
         
         // Create the board panel with background
         boardPanel = new BoardPanel();
@@ -276,89 +281,89 @@ public class GuiView extends JFrame implements GameView {
         setVisible(true);
     }
     
-    private void loadImages() {
-        try {
-            // Load shot counter image
-            File shotFile = new File("gui/shot.png");
-            if (shotFile.exists()) {
-                shotImage = ImageIO.read(shotFile);
-            }
+    // private void loadImages() {
+    //     try {
+    //         // Load shot counter image
+    //         File shotFile = new File("gui/shot.png");
+    //         if (shotFile.exists()) {
+    //             shotImage = ImageIO.read(shotFile);
+    //         }
             
-            // Load the card back image uploaded by the user
-            File cardBackFile = new File("gui/Cardback.png");
-            if (cardBackFile.exists()) {
-                cardBackImage = ImageIO.read(cardBackFile);
-            }
+    //         // Load the card back image uploaded by the user
+    //         File cardBackFile = new File("gui/Cardback.png");
+    //         if (cardBackFile.exists()) {
+    //             cardBackImage = ImageIO.read(cardBackFile);
+    //         }
             
-            // Pre-load dice images
-            for (String color : PLAYER_COLORS) {
-                for (int rank = 1; rank <= 6; rank++) {
-                    String key = color + rank;
-                    File diceFile = new File("gui/Dice/" + key + ".png");
-                    if (diceFile.exists()) {
-                        diceImages.put(key, ImageIO.read(diceFile));
-                    }
-                }
-            }
-        } catch (Exception e) {
-            System.err.println("Error loading images: " + e.getMessage());
-        }
+    //         // Pre-load dice images
+    //         for (String color : PLAYER_COLORS) {
+    //             for (int rank = 1; rank <= 6; rank++) {
+    //                 String key = color + rank;
+    //                 File diceFile = new File("gui/Dice/" + key + ".png");
+    //                 if (diceFile.exists()) {
+    //                     diceImages.put(key, ImageIO.read(diceFile));
+    //                 }
+    //             }
+    //         }
+    //     } catch (Exception e) {
+    //         System.err.println("Error loading images: " + e.getMessage());
+    //     }
 
-        loadRoleCoordinates();
-    }
+    //     loadRoleCoordinates();
+    // }
 
-    private void loadRoleCoordinates() {
-        try {
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder builder = factory.newDocumentBuilder();
+    // private void loadRoleCoordinates() {
+    //     try {
+    //         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+    //         DocumentBuilder builder = factory.newDocumentBuilder();
 
-            Document boardDoc = builder.parse(new File("xml/board.xml"));
-            boardDoc.getDocumentElement().normalize();
-            NodeList setNodes = boardDoc.getElementsByTagName("set");
-            for (int i = 0; i < setNodes.getLength(); i++) {
-                Element setElem = (Element) setNodes.item(i);
-                String setName = setElem.getAttribute("name");
-                NodeList partNodes = setElem.getElementsByTagName("part");
-                for (int j = 0; j < partNodes.getLength(); j++) {
-                    Element partElem = (Element) partNodes.item(j);
-                    String roleName = partElem.getAttribute("name");
-                    NodeList areaNodes = partElem.getElementsByTagName("area");
-                    if (areaNodes.getLength() > 0) {
-                        Element areaElem = (Element) areaNodes.item(0);
-                        int x = Integer.parseInt(areaElem.getAttribute("x"));
-                        int y = Integer.parseInt(areaElem.getAttribute("y"));
-                        int w = Integer.parseInt(areaElem.getAttribute("w"));
-                        int h = Integer.parseInt(areaElem.getAttribute("h"));
-                        offCardRoleCoords.put(setName + "|" + roleName, new Rectangle(x, y, w, h));
-                    }
-                }
-            }
+    //         Document boardDoc = builder.parse(new File("xml/board.xml"));
+    //         boardDoc.getDocumentElement().normalize();
+    //         NodeList setNodes = boardDoc.getElementsByTagName("set");
+    //         for (int i = 0; i < setNodes.getLength(); i++) {
+    //             Element setElem = (Element) setNodes.item(i);
+    //             String setName = setElem.getAttribute("name");
+    //             NodeList partNodes = setElem.getElementsByTagName("part");
+    //             for (int j = 0; j < partNodes.getLength(); j++) {
+    //                 Element partElem = (Element) partNodes.item(j);
+    //                 String roleName = partElem.getAttribute("name");
+    //                 NodeList areaNodes = partElem.getElementsByTagName("area");
+    //                 if (areaNodes.getLength() > 0) {
+    //                     Element areaElem = (Element) areaNodes.item(0);
+    //                     int x = Integer.parseInt(areaElem.getAttribute("x"));
+    //                     int y = Integer.parseInt(areaElem.getAttribute("y"));
+    //                     int w = Integer.parseInt(areaElem.getAttribute("w"));
+    //                     int h = Integer.parseInt(areaElem.getAttribute("h"));
+    //                     offCardRoleCoords.put(setName + "|" + roleName, new Rectangle(x, y, w, h));
+    //                 }
+    //             }
+    //         }
 
-            Document cardsDoc = builder.parse(new File("xml/cards.xml"));
-            cardsDoc.getDocumentElement().normalize();
-            NodeList cardNodes = cardsDoc.getElementsByTagName("card");
-            for (int i = 0; i < cardNodes.getLength(); i++) {
-                Element cardElem = (Element) cardNodes.item(i);
-                String sceneName = cardElem.getAttribute("name");
-                NodeList partNodes = cardElem.getElementsByTagName("part");
-                for (int j = 0; j < partNodes.getLength(); j++) {
-                    Element partElem = (Element) partNodes.item(j);
-                    String roleName = partElem.getAttribute("name");
-                    NodeList areaNodes = partElem.getElementsByTagName("area");
-                    if (areaNodes.getLength() > 0) {
-                        Element areaElem = (Element) areaNodes.item(0);
-                        int x = Integer.parseInt(areaElem.getAttribute("x"));
-                        int y = Integer.parseInt(areaElem.getAttribute("y"));
-                        int w = Integer.parseInt(areaElem.getAttribute("w"));
-                        int h = Integer.parseInt(areaElem.getAttribute("h"));
-                        onCardRoleCoords.put(sceneName + "|" + roleName, new Rectangle(x, y, w, h));
-                    }
-                }
-            }
-        } catch (Exception e) {
-            System.err.println("Error loading role coordinates: " + e.getMessage());
-        }
-    }
+    //         Document cardsDoc = builder.parse(new File("xml/cards.xml"));
+    //         cardsDoc.getDocumentElement().normalize();
+    //         NodeList cardNodes = cardsDoc.getElementsByTagName("card");
+    //         for (int i = 0; i < cardNodes.getLength(); i++) {
+    //             Element cardElem = (Element) cardNodes.item(i);
+    //             String sceneName = cardElem.getAttribute("name");
+    //             NodeList partNodes = cardElem.getElementsByTagName("part");
+    //             for (int j = 0; j < partNodes.getLength(); j++) {
+    //                 Element partElem = (Element) partNodes.item(j);
+    //                 String roleName = partElem.getAttribute("name");
+    //                 NodeList areaNodes = partElem.getElementsByTagName("area");
+    //                 if (areaNodes.getLength() > 0) {
+    //                     Element areaElem = (Element) areaNodes.item(0);
+    //                     int x = Integer.parseInt(areaElem.getAttribute("x"));
+    //                     int y = Integer.parseInt(areaElem.getAttribute("y"));
+    //                     int w = Integer.parseInt(areaElem.getAttribute("w"));
+    //                     int h = Integer.parseInt(areaElem.getAttribute("h"));
+    //                     onCardRoleCoords.put(sceneName + "|" + roleName, new Rectangle(x, y, w, h));
+    //                 }
+    //             }
+    //         }
+    //     } catch (Exception e) {
+    //         System.err.println("Error loading role coordinates: " + e.getMessage());
+    //     }
+    // }
 
     private Point getPlayerDrawPoint(Player player, int fallbackX, int fallbackY) {
         Role role = player.getRole();
